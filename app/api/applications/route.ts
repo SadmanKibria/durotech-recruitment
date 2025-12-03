@@ -21,10 +21,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
+    // Validate file size (5MB max)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024
+    if (resume.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: "File size must be less than 5MB" }, { status: 400 })
+    }
+
     // Upload resume to Vercel Blob
-    const blob = await put(`resumes/${Date.now()}-${resume.name}`, resume, {
-      access: "public",
-    })
+    let resumeUrl = ""
+    let resumeFilename = ""
+
+    try {
+      const blob = await put(`resumes/${Date.now()}-${resume.name}`, resume, {
+        access: "public",
+      })
+      resumeUrl = blob.url
+      resumeFilename = resume.name
+    } catch (uploadError) {
+      console.error("Blob upload error:", uploadError)
+      return NextResponse.json({ error: "Failed to upload resume" }, { status: 500 })
+    }
 
     // Save application to database
     const supabase = await createClient()
@@ -37,8 +53,8 @@ export async function POST(request: NextRequest) {
         email,
         phone,
         right_to_work: rightToWork,
-        resume_url: blob.url,
-        resume_filename: resume.name,
+        resume_url: resumeUrl,
+        resume_filename: resumeFilename,
         cover_letter: coverLetter || null,
         status: "new",
       })
@@ -50,19 +66,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to save application" }, { status: 500 })
     }
 
-    // Send confirmation email to applicant
-    try {
-      await sendApplicationConfirmation(email, name, jobTitle)
-    } catch (emailError) {
-      console.error("Failed to send applicant confirmation:", emailError)
-    }
+    // Send confirmation email to applicant (non-blocking)
+    sendApplicationConfirmation(email, name, jobTitle).catch((err) =>
+      console.error("Failed to send applicant confirmation:", err),
+    )
 
-    // Send notification email to admin
-    try {
-      await sendAdminNotification(name, email, jobTitle, application.id)
-    } catch (emailError) {
-      console.error("Failed to send admin notification:", emailError)
-    }
+    // Send notification email to admin (non-blocking)
+    sendAdminNotification(name, email, jobTitle, application.id).catch((err) =>
+      console.error("Failed to send admin notification:", err),
+    )
 
     return NextResponse.json({ success: true, applicationId: application.id })
   } catch (error) {
