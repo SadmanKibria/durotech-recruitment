@@ -1,15 +1,16 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, Loader2, CheckCircle, FileText, X, AlertCircle } from "lucide-react"
+import { Upload, Loader2, CheckCircle, FileText, X, AlertCircle, Shield } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { generateMathChallenge, validateSubmissionTiming, checkRateLimit, recordSubmission } from "@/lib/security"
 
 interface ApplicationFormProps {
   jobId: string
@@ -31,6 +32,16 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [resumeFile, setResumeFile] = useState<File | null>(null)
+
+  const [formStartTime, setFormStartTime] = useState<number>(0)
+  const [mathChallenge, setMathChallenge] = useState<{ question: string; answer: number } | null>(null)
+  const [mathAnswer, setMathAnswer] = useState("")
+  const [honeypot, setHoneypot] = useState("")
+
+  useEffect(() => {
+    setFormStartTime(Date.now())
+    setMathChallenge(generateMathChallenge())
+  }, [])
 
   const validateFile = (file: File): string | null => {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
@@ -103,6 +114,12 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
       errors.resume = "Please upload your resume/CV"
     }
 
+    if (!mathAnswer.trim()) {
+      errors.math = "Please answer the security question"
+    } else if (mathChallenge && Number.parseInt(mathAnswer) !== mathChallenge.answer) {
+      errors.math = "Incorrect answer. Please try again."
+    }
+
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
   }
@@ -110,6 +127,22 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+
+    if (honeypot) {
+      // Bot detected - silently succeed
+      setIsSuccess(true)
+      return
+    }
+
+    if (!validateSubmissionTiming(formStartTime)) {
+      setError("Please take your time to fill out the form properly.")
+      return
+    }
+
+    if (!checkRateLimit("application_submission", 5, 60 * 60 * 1000)) {
+      setError("Too many submissions. Please try again later.")
+      return
+    }
 
     const formData = new FormData(e.currentTarget)
 
@@ -137,6 +170,7 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
         throw new Error(result.error || "Failed to submit application")
       }
 
+      recordSubmission("application")
       setIsSuccess(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred. Please try again.")
@@ -147,7 +181,7 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
 
   if (isSuccess) {
     return (
-      <div className="text-center py-8 animate-in">
+      <div className="text-center py-8">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
           <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
@@ -166,11 +200,24 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <Alert variant="destructive" className="animate-in">
+        <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      <div className="hidden" aria-hidden="true">
+        <Label htmlFor="website">Website</Label>
+        <Input
+          id="website"
+          name="website"
+          type="text"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
@@ -289,6 +336,25 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
         />
       </div>
 
+      <div className="space-y-2 p-4 bg-muted/50 rounded-lg border">
+        <div className="flex items-center gap-2 mb-2">
+          <Shield className="h-4 w-4 text-primary" />
+          <Label htmlFor="math" className="text-sm font-medium">
+            Security Check *
+          </Label>
+        </div>
+        <p className="text-sm text-muted-foreground mb-2">{mathChallenge?.question}</p>
+        <Input
+          id="math"
+          type="number"
+          value={mathAnswer}
+          onChange={(e) => setMathAnswer(e.target.value)}
+          placeholder="Enter your answer"
+          className={`max-w-32 ${fieldErrors.math ? "border-destructive" : ""}`}
+        />
+        {fieldErrors.math && <p className="text-xs text-destructive">{fieldErrors.math}</p>}
+      </div>
+
       <Button type="submit" disabled={isSubmitting} className="w-full h-11" size="lg">
         {isSubmitting ? (
           <>
@@ -301,7 +367,15 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
       </Button>
 
       <p className="text-xs text-center text-muted-foreground">
-        By submitting this application, you agree to our privacy policy and terms of service.
+        By submitting this application, you agree to our{" "}
+        <a href="/privacy-policy" className="text-primary hover:underline">
+          privacy policy
+        </a>{" "}
+        and{" "}
+        <a href="/terms-of-service" className="text-primary hover:underline">
+          terms of service
+        </a>
+        .
       </p>
     </form>
   )

@@ -5,13 +5,14 @@ import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus, ExternalLink } from "lucide-react"
+import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus, ExternalLink, Inbox } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/jobs", label: "Jobs", icon: FileText },
   { href: "/admin/applications", label: "Applications", icon: Users },
+  { href: "/admin/talent-pool", label: "Talent Pool", icon: Inbox },
 ]
 
 export function AdminSidebar({ user }: { user: User }) {

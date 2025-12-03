@@ -32,6 +32,23 @@ export interface Application {
   job?: Job
 }
 
+export interface SpeculativeCV {
+  id: string
+  name: string
+  email: string
+  phone: string
+  preferred_region: string | null
+  preferred_industry: string | null
+  right_to_work: string
+  resume_url: string
+  resume_filename: string
+  cover_letter: string | null
+  status: "new" | "reviewed" | "contacted" | "archived"
+  admin_notes: string | null
+  created_at: string
+  updated_at: string
+}
+
 export const REGIONS = {
   europe: "Europe",
   middle_east: "Middle East",
@@ -59,4 +76,11 @@ export const APPLICATION_STATUSES = {
   shortlisted: "Shortlisted",
   rejected: "Rejected",
   hired: "Hired",
+} as const
+
+export const CV_STATUSES = {
+  new: "New",
+  reviewed: "Reviewed",
+  contacted: "Contacted",
+  archived: "Archived",
 } as const

@@ -1,6 +1,6 @@
 import { put } from "@vercel/blob"
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { sendApplicationConfirmation, sendAdminNotification } from "@/lib/maileroo"
 
 export async function POST(request: NextRequest) {
@@ -42,8 +42,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to upload resume" }, { status: 500 })
     }
 
-    // Save application to database
-    const supabase = await createClient()
+    const supabase = createAdminClient()
 
     const { data: application, error: dbError } = await supabase
       .from("applications")
