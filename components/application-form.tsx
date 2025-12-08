@@ -87,6 +87,10 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
     const email = formData.get("email") as string
     const phone = formData.get("phone") as string
     const rightToWork = formData.get("rightToWork") as string
+    const citizenshipCountry = formData.get("citizenshipCountry") as string
+    const visaRequired = formData.get("visaRequired") as string
+    const accommodationRequired = formData.get("accommodationRequired") as string
+    const foodRequired = formData.get("foodRequired") as string
 
     if (!name?.trim()) {
       errors.name = "Full name is required"
@@ -108,6 +112,22 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
 
     if (!rightToWork) {
       errors.rightToWork = "Please select your right to work status"
+    }
+
+    if (!citizenshipCountry?.trim()) {
+      errors.citizenshipCountry = "Please enter your citizenship country"
+    }
+
+    if (!visaRequired) {
+      errors.visaRequired = "Please select if visa/permit is required"
+    }
+
+    if (!accommodationRequired) {
+      errors.accommodationRequired = "Please select if accommodation is required"
+    }
+
+    if (!foodRequired) {
+      errors.foodRequired = "Please select if food is required"
     }
 
     if (!resumeFile) {
@@ -278,6 +298,68 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
             </SelectContent>
           </Select>
           {fieldErrors.rightToWork && <p className="text-xs text-destructive">{fieldErrors.rightToWork}</p>}
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="visaRequired">
+            Visa/Permit Required <span className="text-destructive">*</span>
+          </Label>
+          <Select name="visaRequired" defaultValue="No">
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Yes">Yes</SelectItem>
+              <SelectItem value="No">No</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="citizenshipCountry">
+            Citizenship Country <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="citizenshipCountry"
+            name="citizenshipCountry"
+            placeholder="e.g., Bangladesh"
+            className={fieldErrors.citizenshipCountry ? "border-destructive" : ""}
+          />
+          {fieldErrors.citizenshipCountry && (
+            <p className="text-xs text-destructive">{fieldErrors.citizenshipCountry}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="accommodationRequired">
+            Accommodation Required <span className="text-destructive">*</span>
+          </Label>
+          <Select name="accommodationRequired" defaultValue="No">
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Yes">Yes</SelectItem>
+              <SelectItem value="No">No</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="foodRequired">
+            Food Required <span className="text-destructive">*</span>
+          </Label>
+          <Select name="foodRequired" defaultValue="No">
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Yes">Yes</SelectItem>
+              <SelectItem value="No">No</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

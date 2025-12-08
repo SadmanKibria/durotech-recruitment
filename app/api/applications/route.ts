@@ -15,26 +15,25 @@ export async function POST(request: NextRequest) {
     const rightToWork = formData.get("rightToWork") as string
     const coverLetter = formData.get("coverLetter") as string | null
     const resume = formData.get("resume") as File
+    const visaRequired = (formData.get("visaRequired") as string) || "No"
+    const citizenshipCountry = formData.get("citizenshipCountry") as string
+    const accommodationRequired = (formData.get("accommodationRequired") as string) || "No"
+    const foodRequired = (formData.get("foodRequired") as string) || "No"
 
-    // Validate required fields
     if (!jobId || !name || !email || !phone || !rightToWork || !resume) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    // Validate file size (5MB max)
     const MAX_FILE_SIZE = 5 * 1024 * 1024
     if (resume.size > MAX_FILE_SIZE) {
       return NextResponse.json({ error: "File size must be less than 5MB" }, { status: 400 })
     }
 
-    // Upload resume to Vercel Blob
     let resumeUrl = ""
     let resumeFilename = ""
 
     try {
-      const blob = await put(`resumes/${Date.now()}-${resume.name}`, resume, {
-        access: "public",
-      })
+      const blob = await put(`resumes/${Date.now()}-${resume.name}`, resume, { access: "public" })
       resumeUrl = blob.url
       resumeFilename = resume.name
     } catch (uploadError) {
@@ -44,18 +43,32 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient()
 
+    const { data: existingApplications } = await supabase
+      .from("applications")
+      .select("id, job_id")
+      .eq("email", email.toLowerCase().trim())
+
+    const isDuplicate = existingApplications && existingApplications.length > 0
+    const duplicateIds = existingApplications?.map((app) => app.id) || []
+
     const { data: application, error: dbError } = await supabase
       .from("applications")
       .insert({
         job_id: jobId,
         name,
-        email,
+        email: email.toLowerCase().trim(),
         phone,
         right_to_work: rightToWork,
+        visa_required: visaRequired,
+        citizenship_country: citizenshipCountry,
+        accommodation_required: accommodationRequired,
+        food_required: foodRequired,
         resume_url: resumeUrl,
         resume_filename: resumeFilename,
         cover_letter: coverLetter || null,
-        status: "new",
+        status: "applied",
+        is_duplicate: isDuplicate,
+        duplicate_application_ids: isDuplicate ? duplicateIds : null,
       })
       .select()
       .single()
@@ -65,15 +78,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to save application" }, { status: 500 })
     }
 
-    // Send confirmation email to applicant (non-blocking)
-    sendApplicationConfirmation(email, name, jobTitle).catch((err) =>
-      console.error("Failed to send applicant confirmation:", err),
-    )
+    if (isDuplicate) {
+      await supabase.from("application_notes").insert({
+        application_id: application.id,
+        note_type: "system",
+        content: `Duplicate applicant detected. This email has ${duplicateIds.length} other application(s).`,
+        created_by: "System",
+      })
+    }
 
-    // Send notification email to admin (non-blocking)
-    sendAdminNotification(name, email, jobTitle, application.id).catch((err) =>
-      console.error("Failed to send admin notification:", err),
-    )
+    sendApplicationConfirmation(email, name, jobTitle).catch(console.error)
+    sendAdminNotification(name, email, jobTitle, application.id).catch(console.error)
 
     return NextResponse.json({ success: true, applicationId: application.id })
   } catch (error) {

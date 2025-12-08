@@ -4,23 +4,34 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Edit, MapPin, Building2 } from "lucide-react"
-import { REGIONS, INDUSTRIES } from "@/lib/types"
+import { Plus, Edit, MapPin, Building2, Users } from "lucide-react"
+import { REGIONS, INDUSTRIES, CURRENCIES } from "@/lib/types"
 import { JobStatusToggle } from "@/components/admin/job-status-toggle"
 import { NoJobsPosted } from "@/components/empty-states"
 import { DeleteJobButton } from "@/components/admin/delete-job-button"
+import { SearchBar } from "@/components/admin/search-bar"
 
-export default async function AdminJobsPage() {
+export default async function AdminJobsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string }>
+}) {
+  const { search } = await searchParams
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect("/admin/login")
+  if (!user) redirect("/admin/login")
+
+  let query = supabase.from("jobs").select("*").order("created_at", { ascending: false })
+  if (search) {
+    query = query.or(
+      `title.ilike.%${search}%,company_name.ilike.%${search}%,location.ilike.%${search}%,country.ilike.%${search}%`,
+    )
   }
 
-  const { data: jobs } = await supabase.from("jobs").select("*").order("created_at", { ascending: false })
+  const { data: jobs } = await query
 
   return (
     <div className="space-y-6">
@@ -37,6 +48,8 @@ export default async function AdminJobsPage() {
         </Link>
       </div>
 
+      <SearchBar placeholder="Search by title, company, or location..." baseUrl="/admin/jobs" />
+
       <div className="grid gap-4">
         {jobs && jobs.length > 0 ? (
           jobs.map((job) => (
@@ -49,7 +62,14 @@ export default async function AdminJobsPage() {
                       <Badge variant={job.is_active ? "default" : "secondary"}>
                         {job.is_active ? "Active" : "Inactive"}
                       </Badge>
+                      {job.positions_available > 1 && (
+                        <Badge variant="outline" className="gap-1">
+                          <Users className="h-3 w-3" />
+                          {job.positions_available} positions
+                        </Badge>
+                      )}
                     </div>
+                    {job.company_name && <p className="text-sm font-medium text-primary">{job.company_name}</p>}
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
@@ -61,9 +81,12 @@ export default async function AdminJobsPage() {
                       </span>
                       <span>{REGIONS[job.region as keyof typeof REGIONS]}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Posted: {new Date(job.created_at).toLocaleDateString()}
-                    </p>
+                    {job.salary_range && (
+                      <p className="text-sm font-medium">
+                        {CURRENCIES[job.currency as keyof typeof CURRENCIES]?.split(" ")[0] || job.currency}{" "}
+                        {job.salary_range}/month
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
                     <JobStatusToggle job={job} />
