@@ -13,11 +13,11 @@ export function Footer() {
                 <Briefcase className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="text-lg font-bold">
-                Durotech<span className="text-primary">Recruitment</span>
+                Durotech<span className="text-primary">Limited</span>
               </span>
             </Link>
             <p className="mt-4 text-sm text-slate-400 leading-relaxed">
-              Connecting talented professionals with leading employers across Europe, the Middle East, and Asia.
+              Connecting talented professionals with leading employers across Europe, the Middle East and Asia.
             </p>
             <p className="mt-2 text-xs text-slate-500">Trading as Durotech Recruitment</p>
           </div>
@@ -139,7 +139,7 @@ export function Footer() {
         <div className="mt-8 border-t border-slate-800 pt-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-500">
-              &copy; {new Date().getFullYear()} Durotech Limited. All rights reserved.
+              &copy; {new Date().getFullYear()} Durotech Limited Trading as Durotech Recruitment. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <Link
