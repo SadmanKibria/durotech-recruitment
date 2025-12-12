@@ -6,18 +6,22 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Download, Mail, Phone, Briefcase, Globe, Home, Utensils, AlertTriangle, User } from "lucide-react"
 import { APPLICATION_STATUSES, INDUSTRIES, REGIONS } from "@/lib/types"
-import { ApplicationStatusSelect } from "@/components/admin/application-status-select"
 import { ApplicationNotes } from "@/components/admin/application-notes"
-import { ApplicationPayments } from "@/components/admin/application-payments"
 import { EmailApplicantButton } from "@/components/admin/email-applicant-button"
 import { ApplicationReferenceAgent } from "@/components/admin/application-reference-agent"
+import { ApplicationManagementForm } from "@/components/admin/application-management-form"
 
 export default async function ApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+
+  let user = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data?.user
+  } catch (error) {
+    console.error("Auth error:", error)
+  }
 
   if (!user) redirect("/admin/login")
 
@@ -207,25 +211,14 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
         </Card>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Update Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ApplicationStatusSelect application={application} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Payment History</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ApplicationPayments applicationId={application.id} />
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Application Management</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ApplicationManagementForm application={application} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

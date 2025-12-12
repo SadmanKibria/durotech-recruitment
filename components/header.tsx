@@ -3,9 +3,8 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
-import { Menu, X, Briefcase, FileText, GraduationCap, ChevronDown } from "lucide-react"
+import { Menu, X, Briefcase, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -27,51 +26,18 @@ export function Header() {
           >
             Home
           </Link>
-
-          {/* Employment Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors flex items-center gap-1">
-              Employment
-              <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link href="/jobs" className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Find Jobs
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/submit-cv" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Submit CV
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Study Abroad Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors flex items-center gap-1">
-              Study Abroad
-              <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link href="/study-abroad" className="flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4" />
-                  Programs
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/study-abroad#apply" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Apply Now
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+          <Link
+            href="/jobs"
+            className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+          >
+            Employment
+          </Link>
+          <Link
+            href="/study-abroad"
+            className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+          >
+            Study Abroad
+          </Link>
           <Link
             href="/about"
             className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
@@ -88,9 +54,9 @@ export function Header() {
 
         <div className="hidden lg:flex gap-2">
           <Button asChild variant="outline" className="bg-transparent">
-            <Link href="/study-abroad">
-              <GraduationCap className="mr-2 h-4 w-4" />
-              Study Abroad
+            <Link href="/submit-cv">
+              <FileText className="mr-2 h-4 w-4" />
+              Submit CV
             </Link>
           </Button>
           <Button asChild>
@@ -111,7 +77,7 @@ export function Header() {
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu - simplified */}
       {isMenuOpen && (
         <div className="border-t lg:hidden">
           <nav className="flex flex-col p-4 bg-background">
@@ -122,36 +88,23 @@ export function Header() {
             >
               Home
             </Link>
-            <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Employment
-            </div>
             <Link
               href="/jobs"
-              className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors pl-6"
+              className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Find Jobs
+              Employment
             </Link>
-            <Link
-              href="/submit-cv"
-              className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors pl-6"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Submit CV
-            </Link>
-            <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-2">
-              Study Abroad
-            </div>
             <Link
               href="/study-abroad"
-              className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors pl-6"
+              className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Programs
+              Study Abroad
             </Link>
             <Link
               href="/about"
-              className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors mt-2"
+              className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               About Us
@@ -165,9 +118,9 @@ export function Header() {
             </Link>
             <div className="pt-3 mt-3 border-t space-y-2">
               <Button asChild variant="outline" className="w-full bg-transparent">
-                <Link href="/study-abroad" onClick={() => setIsMenuOpen(false)}>
-                  <GraduationCap className="mr-2 h-4 w-4" />
-                  Study Abroad
+                <Link href="/submit-cv" onClick={() => setIsMenuOpen(false)}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Submit CV
                 </Link>
               </Button>
               <Button asChild className="w-full">

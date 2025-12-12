@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import { sendEmail } from "@/lib/maileroo"
+import { sendCustomEmail } from "@/lib/maileroo"
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,13 +14,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { to, subject, html } = await request.json()
+    const { to, subject, message } = await request.json()
 
-    if (!to || !subject || !html) {
+    if (!to || !subject || !message) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    const success = await sendEmail({ to, subject, html })
+    const success = await sendCustomEmail(to, subject, message)
 
     if (success) {
       return NextResponse.json({ success: true })
