@@ -124,8 +124,8 @@ export function SubmitCVForm() {
       return
     }
 
-    if (!checkRateLimit("cv_submission", 3, 60 * 60 * 1000)) {
-      setError("Too many submissions. Please try again later.")
+    if (!checkRateLimit("cv_submission", 5, 24 * 60 * 60 * 1000)) {
+      setError("You've submitted multiple CVs recently. Please try again tomorrow or contact us directly.")
       return
     }
 
@@ -144,7 +144,8 @@ export function SubmitCVForm() {
       })
 
       if (!uploadResponse.ok) {
-        throw new Error("Failed to upload resume")
+        const errorData = await uploadResponse.json()
+        throw new Error(errorData.error || "Failed to upload resume")
       }
 
       const { url: resumeUrl } = await uploadResponse.json()
@@ -168,7 +169,8 @@ export function SubmitCVForm() {
       recordSubmission("cv")
       setSuccess(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong")
+      console.error("[CV_SUBMIT_ERROR]", err)
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again or contact us directly.")
     } finally {
       setIsSubmitting(false)
     }
@@ -279,10 +281,10 @@ export function SubmitCVForm() {
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="citizen">Citizen</SelectItem>
-                  <SelectItem value="permanent_resident">Permanent Resident</SelectItem>
-                  <SelectItem value="work_visa">Work Visa</SelectItem>
-                  <SelectItem value="require_sponsorship">Require Sponsorship</SelectItem>
+                  <SelectItem value="Citizen">Citizen</SelectItem>
+                  <SelectItem value="Permanent Resident">Permanent Resident</SelectItem>
+                  <SelectItem value="Work Visa">Work Visa</SelectItem>
+                  <SelectItem value="Require Sponsorship">Require Sponsorship</SelectItem>
                 </SelectContent>
               </Select>
               {errors.right_to_work && <p className="text-sm text-destructive">{errors.right_to_work}</p>}
