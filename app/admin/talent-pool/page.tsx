@@ -1,15 +1,26 @@
 import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Download, Mail, Eye, Inbox } from "lucide-react"
+import { Download, Mail, Eye, Inbox, Plus } from "lucide-react"
 import Link from "next/link"
 import { type SpeculativeCV, CV_STATUSES, REGIONS, INDUSTRIES } from "@/lib/types"
 import { formatDistanceToNow } from "date-fns"
 
 export default async function TalentPoolPage() {
-  const supabase = await createClient()
+  let user = null
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.auth.getUser()
+    user = data?.user
+  } catch (error) {
+    console.error("Auth error:", error)
+  }
 
+  if (!user) redirect("/admin/login")
+
+  const supabase = await createClient()
   const { data: cvs, error } = await supabase
     .from("speculative_cvs")
     .select("*")
@@ -33,17 +44,23 @@ export default async function TalentPoolPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Talent Pool</h1>
-          <p className="text-muted-foreground">
-            Manage speculative CVs from candidates looking for future opportunities
-          </p>
+          <p className="text-muted-foreground">Manage speculative CVs from potential candidates</p>
         </div>
-        <Badge variant="secondary" className="text-lg px-4 py-2">
-          {speculativeCVs.length} CVs
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="text-lg px-4 py-2">
+            {speculativeCVs.length} CVs
+          </Badge>
+          <Link href="/admin/talent-pool/add">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add CV Manually
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {speculativeCVs.length === 0 ? (
@@ -54,6 +71,12 @@ export default async function TalentPoolPage() {
             <p className="text-muted-foreground text-center mt-2 max-w-md">
               When candidates submit their CVs for future opportunities, they will appear here.
             </p>
+            <Link href="/admin/talent-pool/add">
+              <Button className="mt-4 bg-transparent" variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Add First CV Manually
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       ) : (
@@ -73,12 +96,12 @@ export default async function TalentPoolPage() {
                       <p className="font-medium text-foreground">{cv.email}</p>
                       <p>{cv.phone}</p>
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {cv.preferred_region && (
+                        {cv.preferred_region && cv.preferred_region !== "any" && (
                           <Badge variant="outline">
                             {REGIONS[cv.preferred_region as keyof typeof REGIONS] || cv.preferred_region}
                           </Badge>
                         )}
-                        {cv.preferred_industry && (
+                        {cv.preferred_industry && cv.preferred_industry !== "any" && (
                           <Badge variant="outline">
                             {INDUSTRIES[cv.preferred_industry as keyof typeof INDUSTRIES] || cv.preferred_industry}
                           </Badge>
