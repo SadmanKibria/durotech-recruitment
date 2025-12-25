@@ -16,6 +16,8 @@ import {
   Shirt,
   Warehouse,
   Factory,
+  MapPin,
+  TrendingUp,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -60,18 +62,24 @@ export default async function HomePage() {
       key: "europe",
       countries: "Germany, Netherlands, Poland, UK, France",
       image: "/european-city-skyline-architecture.jpg",
+      jobs: "2,500+",
+      icon: Building2,
     },
     {
       name: "Middle East",
       key: "middle_east",
       countries: "UAE, Saudi Arabia, Qatar, Kuwait, Bahrain",
       image: "/dubai-modern-skyline-desert.jpg",
+      jobs: "1,800+",
+      icon: Globe,
     },
     {
       name: "Asia",
       key: "asia",
       countries: "Singapore, Philippines, Thailand, Vietnam, Malaysia",
       image: "/singapore-modern-city-skyline.jpg",
+      jobs: "3,200+",
+      icon: TrendingUp,
     },
   ]
 
@@ -108,7 +116,7 @@ export default async function HomePage() {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="h-12 px-6 border-slate-500 text-white hover:bg-slate-800 bg-transparent"
+                  className="h-12 px-6 border-white text-white hover:bg-white hover:text-[#1E3A5F] transition-all bg-transparent"
                 >
                   <Link href="/study-abroad">
                     <GraduationCap className="mr-2 h-5 w-5" />
@@ -282,37 +290,87 @@ export default async function HomePage() {
         </section>
 
         {/* Regions Section */}
-        <section className="py-16 md:py-20 bg-secondary/30">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="relative py-16 md:py-24 bg-gradient-to-br from-[#1E3A5F] via-[#2A4A6F] to-[#1E3A5F] overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/abstract-geometric-pattern.png')] opacity-5" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">We Operate Globally</h2>
-              <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-                Find opportunities in your preferred region
+              <Badge className="bg-[#F5C547] text-[#1E3A5F] mb-4">Global Opportunities</Badge>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white">We Operate Globally</h2>
+              <p className="mt-3 text-lg text-slate-300 max-w-2xl mx-auto">
+                Find opportunities in your preferred region across three continents
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">
-              {regions.map((region) => (
-                <Link key={region.key} href={`/jobs?region=${region.key}`} className="group">
-                  <Card className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all">
-                    <div className="aspect-[16/10] relative">
+              {regions.map((region, index) => (
+                <Link
+                  key={region.key}
+                  href={`/jobs?region=${region.key}`}
+                  className="group"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white">
+                    <div className="aspect-[16/11] relative">
                       <img
                         src={region.image || "/placeholder.svg"}
                         alt={region.name}
-                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#1E3A5F]/90 via-[#1E3A5F]/40 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-5">
-                        <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                          {region.name}
-                          <ChevronRight className="h-5 w-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                        </h3>
-                        <p className="text-sm text-slate-300 mt-1">{region.countries}</p>
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#1E3A5F] via-[#1E3A5F]/60 to-transparent opacity-90 group-hover:opacity-95 transition-opacity" />
+
+                      {/* Icon badge */}
+                      <div className="absolute top-4 right-4">
+                        <div className="w-12 h-12 rounded-full bg-[#F5C547] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                          <region.icon className="h-6 w-6 text-[#1E3A5F]" />
+                        </div>
+                      </div>
+
+                      {/* Content overlay */}
+                      <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                        <div className="transform group-hover:translate-y-0 transition-transform">
+                          <div className="flex items-center gap-2 mb-3">
+                            <MapPin className="h-4 w-4 text-[#F5C547]" />
+                            <span className="text-xs font-medium text-[#F5C547] uppercase tracking-wider">
+                              {region.jobs} Active Jobs
+                            </span>
+                          </div>
+                          <h3 className="text-2xl font-bold text-white flex items-center gap-2 mb-2">
+                            {region.name}
+                            <ChevronRight className="h-5 w-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                          </h3>
+                          <p className="text-sm text-slate-200 leading-relaxed">{region.countries}</p>
+                        </div>
+
+                        {/* Hover overlay */}
+                        <div className="mt-4 pt-4 border-t border-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="flex items-center justify-between text-white">
+                            <span className="text-sm font-medium">Explore Opportunities</span>
+                            <ArrowRight className="h-4 w-4" />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </Card>
                 </Link>
               ))}
+            </div>
+
+            {/* Bottom CTA */}
+            <div className="mt-12 text-center">
+              <p className="text-slate-300 mb-4">Can't find your region?</p>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-white text-white hover:bg-white hover:text-[#1E3A5F] bg-transparent"
+              >
+                <Link href="/jobs">
+                  <Globe className="mr-2 h-5 w-5" />
+                  View All Jobs Worldwide
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
