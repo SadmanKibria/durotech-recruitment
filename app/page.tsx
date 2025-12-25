@@ -16,7 +16,6 @@ import {
   Shirt,
   Warehouse,
   Factory,
-  MapPin,
   TrendingUp,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -290,81 +289,79 @@ export default async function HomePage() {
         </section>
 
         {/* Regions Section */}
-        <section className="relative py-16 md:py-24 bg-gradient-to-br from-[#1E3A5F] via-[#2A4A6F] to-[#1E3A5F] overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/abstract-geometric-pattern.png')] opacity-5" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+        <section className="relative py-20 md:py-28 bg-gradient-to-b from-slate-50 to-white overflow-hidden">
+          {/* Subtle background pattern */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(30,58,95,0.05)_0%,transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(245,197,71,0.05)_0%,transparent_50%)]" />
 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <Badge className="bg-[#F5C547] text-[#1E3A5F] mb-4">Global Opportunities</Badge>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white">We Operate Globally</h2>
-              <p className="mt-3 text-lg text-slate-300 max-w-2xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1E3A5F]/5 mb-4">
+                <Globe className="h-4 w-4 text-[#1E3A5F]" />
+                <span className="text-sm font-medium text-[#1E3A5F]">Global Opportunities</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-[#1E3A5F] mb-4">We Operate Globally</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
                 Find opportunities in your preferred region across three continents
               </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
+            {/* Regions Grid */}
+            <div className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto">
               {regions.map((region, index) => (
                 <Link
                   key={region.key}
                   href={`/jobs?region=${region.key}`}
-                  className="group"
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  className="group relative"
+                  style={{
+                    animation: "fadeInUp 0.6s ease-out forwards",
+                    animationDelay: `${index * 100}ms`,
+                    opacity: 0,
+                  }}
                 >
-                  <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white">
-                    <div className="aspect-[16/11] relative">
-                      <img
-                        src={region.image || "/placeholder.svg"}
-                        alt={region.name}
-                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#1E3A5F] via-[#1E3A5F]/60 to-transparent opacity-90 group-hover:opacity-95 transition-opacity" />
+                  <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+                    {/* Top colored bar */}
+                    <div className="h-2 w-full bg-gradient-to-r from-[#1E3A5F] to-[#F5C547]" />
 
-                      {/* Icon badge */}
-                      <div className="absolute top-4 right-4">
-                        <div className="w-12 h-12 rounded-full bg-[#F5C547] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                          <region.icon className="h-6 w-6 text-[#1E3A5F]" />
-                        </div>
+                    {/* Content */}
+                    <div className="p-8">
+                      {/* Icon */}
+                      <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[#1E3A5F] to-[#2A4A6F] mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <region.icon className="h-7 w-7 text-white" />
                       </div>
 
-                      {/* Content overlay */}
-                      <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                        <div className="transform group-hover:translate-y-0 transition-transform">
-                          <div className="flex items-center gap-2 mb-3">
-                            <MapPin className="h-4 w-4 text-[#F5C547]" />
-                            <span className="text-xs font-medium text-[#F5C547] uppercase tracking-wider">
-                              {region.jobs} Active Jobs
-                            </span>
-                          </div>
-                          <h3 className="text-2xl font-bold text-white flex items-center gap-2 mb-2">
-                            {region.name}
-                            <ChevronRight className="h-5 w-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-                          </h3>
-                          <p className="text-sm text-slate-200 leading-relaxed">{region.countries}</p>
-                        </div>
+                      {/* Region name */}
+                      <h3 className="text-2xl font-bold text-[#1E3A5F] mb-2 flex items-center gap-2">
+                        {region.name}
+                        <ChevronRight className="h-5 w-5 text-[#F5C547] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                      </h3>
 
-                        {/* Hover overlay */}
-                        <div className="mt-4 pt-4 border-t border-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="flex items-center justify-between text-white">
-                            <span className="text-sm font-medium">Explore Opportunities</span>
-                            <ArrowRight className="h-4 w-4" />
-                          </div>
-                        </div>
+                      {/* Countries */}
+                      <p className="text-sm text-slate-600 mb-4 leading-relaxed">{region.countries}</p>
+
+                      {/* Job count badge */}
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5C547]/10 border border-[#F5C547]/20">
+                        <Briefcase className="h-3.5 w-3.5 text-[#1E3A5F]" />
+                        <span className="text-sm font-semibold text-[#1E3A5F]">{region.jobs} Jobs</span>
                       </div>
                     </div>
-                  </Card>
+
+                    {/* Hover indicator */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A5F] to-[#F5C547] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                  </div>
                 </Link>
               ))}
             </div>
 
             {/* Bottom CTA */}
-            <div className="mt-12 text-center">
-              <p className="text-slate-300 mb-4">Can't find your region?</p>
+            <div className="mt-16 text-center">
+              <p className="text-slate-600 mb-4">Looking for something else?</p>
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-[#1E3A5F] bg-transparent"
+                className="border-[#1E3A5F] text-[#1E3A5F] hover:bg-[#1E3A5F] hover:text-white transition-all bg-transparent"
               >
                 <Link href="/jobs">
                   <Globe className="mr-2 h-5 w-5" />
@@ -375,6 +372,7 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* Industries Section */}
         <section className="py-16 md:py-20 bg-background">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
