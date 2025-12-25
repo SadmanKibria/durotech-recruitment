@@ -7,6 +7,37 @@ import type { Job } from "@/lib/types"
 import { JobFilters } from "@/components/job-filters"
 import { NoJobsFound, SearchNoResults } from "@/components/empty-states"
 import { JobCardGridSkeleton } from "@/components/loading-skeletons"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "International Jobs - Europe, Middle East & Asia",
+  description:
+    "Browse thousands of job opportunities in construction, healthcare, engineering, warehousing, food production, and garments across 30+ countries. Visa sponsorship available. Apply today with Durotech Recruitment.",
+  keywords: [
+    "international jobs",
+    "overseas jobs",
+    "work abroad",
+    "construction jobs Europe",
+    "healthcare jobs UK",
+    "engineering jobs Middle East",
+    "warehouse jobs",
+    "food production jobs",
+    "garment industry jobs",
+    "visa sponsorship jobs",
+    "Europe jobs",
+    "Middle East jobs",
+    "Asia jobs",
+  ],
+  openGraph: {
+    title: "Find Your Dream Job Abroad - Durotech Recruitment",
+    description:
+      "Explore international job opportunities across Europe, Middle East, and Asia with visa sponsorship support.",
+    url: "https://durotech.co.uk/jobs",
+  },
+  alternates: {
+    canonical: "https://durotech.co.uk/jobs",
+  },
+}
 
 interface JobsPageProps {
   searchParams: Promise<{
