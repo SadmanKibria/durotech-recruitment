@@ -9,20 +9,51 @@ import { APPLICATION_STATUSES } from "@/lib/types"
 import { DashboardCharts } from "@/components/admin/dashboard-charts"
 
 export default async function AdminDashboardPage() {
+  // In production, this would be handled by middleware
+
   let user = null
+  let authError = false
+
   try {
     const supabase = await createClient()
-    const { data } = await supabase.auth.getUser()
-    user = data?.user
+    const { data, error } = await supabase.auth.getUser()
+
+    if (error) {
+      console.error("Auth error:", error)
+      authError = true
+    } else {
+      user = data?.user
+    }
   } catch (error) {
-    console.error("Auth error:", error)
+    console.error("Auth exception:", error)
+    authError = true
   }
 
-  if (!user) {
+  // Only redirect if we're certain there's no user (not just a network error)
+  if (!user && !authError) {
     redirect("/admin/login")
   }
 
-  const supabase = await createClient()
+  let supabase
+  try {
+    supabase = await createClient()
+  } catch (error) {
+    console.error("Failed to create Supabase client:", error)
+    // Return a minimal dashboard if Supabase is unavailable
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground text-sm">Loading dashboard data...</p>
+        </div>
+        <Card>
+          <CardContent className="py-8 text-center">
+            <p className="text-muted-foreground">Unable to connect to database. Please check your connection.</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   // Fetch stats with error handling
   let totalJobs = 0,

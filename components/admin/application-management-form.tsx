@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Plus, Save, User, DollarSign, FileText, Upload, Check, AlertCircle } from "lucide-react"
+import { Loader2, Plus, Save, DollarSign, FileText, Upload, Check, AlertCircle } from "lucide-react"
 import { APPLICATION_STATUSES } from "@/lib/types"
 import type { Application } from "@/lib/types"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -28,6 +28,7 @@ export function ApplicationManagementForm({ application }: { application: Applic
   const [status, setStatus] = useState(application.status)
   const [visaStatus, setVisaStatus] = useState(application.visa_status || "")
   const [referenceAgent, setReferenceAgent] = useState(application.reference_agent || "")
+  const [totalAgreedAmount, setTotalAgreedAmount] = useState(application.total_agreed_amount?.toString() || "")
 
   // Payment form
   const [paymentType, setPaymentType] = useState("incoming")
@@ -53,6 +54,7 @@ export function ApplicationManagementForm({ application }: { application: Applic
           status,
           visa_status: visaStatus || null,
           reference_agent: referenceAgent || null,
+          total_agreed_amount: totalAgreedAmount ? Number.parseFloat(totalAgreedAmount) : null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", application.id)
@@ -199,7 +201,7 @@ export function ApplicationManagementForm({ application }: { application: Applic
       )}
 
       {/* Status & Core Fields */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-2">
           <Label htmlFor="status">Application Status</Label>
           <Select value={status} onValueChange={setStatus}>
@@ -222,20 +224,35 @@ export function ApplicationManagementForm({ application }: { application: Applic
             id="visaStatus"
             value={visaStatus}
             onChange={(e) => setVisaStatus(e.target.value)}
-            placeholder="e.g., In Process, Approved, etc."
+            placeholder="e.g., In Process, Approved"
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="referenceAgent">
-            <User className="h-4 w-4 inline mr-1" />
+            <DollarSign className="h-3 w-3 inline mr-1" />
             Reference / Agent
           </Label>
           <Input
             id="referenceAgent"
             value={referenceAgent}
             onChange={(e) => setReferenceAgent(e.target.value)}
-            placeholder="e.g., Global Recruitment Agency"
+            placeholder="e.g., Global Recruitment"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="totalAgreedAmount">
+            <DollarSign className="h-3 w-3 inline mr-1" />
+            Total Agreed Amount (£)
+          </Label>
+          <Input
+            id="totalAgreedAmount"
+            type="number"
+            step="0.01"
+            value={totalAgreedAmount}
+            onChange={(e) => setTotalAgreedAmount(e.target.value)}
+            placeholder="0.00"
           />
         </div>
       </div>

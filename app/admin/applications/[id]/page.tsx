@@ -4,11 +4,21 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Download, Mail, Phone, Briefcase, Globe, Home, Utensils, AlertTriangle, User } from "lucide-react"
+import {
+  ArrowLeft,
+  Download,
+  Mail,
+  Phone,
+  Briefcase,
+  Globe,
+  Home,
+  Utensils,
+  AlertTriangle,
+  DollarSign,
+} from "lucide-react"
 import { APPLICATION_STATUSES, INDUSTRIES, REGIONS } from "@/lib/types"
 import { ApplicationNotes } from "@/components/admin/application-notes"
 import { EmailApplicantButton } from "@/components/admin/email-applicant-button"
-import { ApplicationReferenceAgent } from "@/components/admin/application-reference-agent"
 import { ApplicationManagementForm } from "@/components/admin/application-management-form"
 
 export default async function ApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -107,6 +117,15 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
                 <p className="font-medium">{application.citizenship_country || "Not specified"}</p>
               </div>
             </div>
+            {application.total_agreed_amount && (
+              <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                <DollarSign className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Agreed Amount</p>
+                  <p className="font-bold text-lg text-primary">£{application.total_agreed_amount.toFixed(2)}</p>
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-3 gap-2 pt-2">
               <div className="text-center p-2 bg-muted rounded-lg">
                 <p className="text-xs text-muted-foreground">Visa Required</p>
@@ -187,18 +206,6 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Reference / Agent
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ApplicationReferenceAgent application={application} />
-        </CardContent>
-      </Card>
 
       {application.cover_letter && (
         <Card>

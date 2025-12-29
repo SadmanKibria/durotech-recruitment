@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     locale: "en_GB",
     url: "https://durotech.co.uk",
     siteName: "Durotech Recruitment",
-    title: "Durotech Recruitment | International Staffing & Study Abroad Solutions",
+    title: "Durotech Recruitment | International Staffing Solutions by Sadman Kibria",
     description:
       "Leading international recruitment agency founded by Sadman Kibria. 15+ years connecting talented professionals with top employers and students with world-class universities across Europe, Middle East, and Asia.",
     images: [
@@ -109,6 +109,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" type="image/png" href="/durotech-logo.png" />
+        <link rel="apple-touch-icon" href="/durotech-logo.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
