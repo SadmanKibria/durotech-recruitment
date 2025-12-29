@@ -1,156 +1,97 @@
-interface EmailOptions {
-  to: string
-  subject: string
-  html: string
+const MAILEROO_API_KEY = process.env.MAILEROO_API_KEY
+const FROM_EMAIL = process.env.FROM_EMAIL || "info@durotech.co.uk"
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@durotech.co.uk"
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://durotech.co.uk"
+
+interface MailerooResponse {
+  success: boolean
+  message?: string
 }
 
-async function sendEmail({ to, subject, html }: EmailOptions): Promise<boolean> {
+async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+  if (!MAILEROO_API_KEY) {
+    console.error("[MAILEROO] API key not configured")
+    return false
+  }
+
   try {
-    const apiKey = process.env.MAILEROO_API_KEY
-    const fromEmail = process.env.FROM_EMAIL || "noreply@durotech.co.uk"
-
-    if (!apiKey) {
-      console.error("MAILEROO_API_KEY not configured")
-      return false
-    }
-
     const response = await fetch("https://smtp.maileroo.com/send", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-Key": apiKey,
+        "X-API-Key": MAILEROO_API_KEY,
       },
       body: JSON.stringify({
-        from: fromEmail,
-        to,
+        from: FROM_EMAIL,
+        to: [to],
         subject,
         html,
       }),
     })
 
     if (!response.ok) {
-      const error = await response.text()
-      console.error("Maileroo error:", error)
+      const errorText = await response.text()
+      console.error("[MAILEROO] Send failed:", response.status, errorText)
       return false
     }
 
     return true
   } catch (error) {
-    console.error("Email send error:", error)
+    console.error("[MAILEROO] Error:", error)
     return false
   }
 }
 
-function getEmailTemplate(title: string, content: string, ctaText?: string, ctaLink?: string): string {
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          
-          <!-- Header -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #1E3A5F 0%, #2C5282 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">
-                Durotech<span style="color: #F5C547;">Recruitment</span>
-              </h1>
-              <p style="margin: 10px 0 0 0; color: #E5E7EB; font-size: 14px;">International Staffing Solutions</p>
-            </td>
-          </tr>
-          
-          <!-- Content -->
-          <tr>
-            <td style="padding: 40px 30px;">
-              ${content}
-            </td>
-          </tr>
-          
-          <!-- CTA Button (if provided) -->
-          ${
-            ctaText && ctaLink
-              ? `
-          <tr>
-            <td style="padding: 0 30px 40px 30px; text-align: center;">
-              <a href="${ctaLink}" style="display: inline-block; background-color: #1E3A5F; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">
-                ${ctaText}
-              </a>
-            </td>
-          </tr>
-          `
-              : ""
-          }
-          
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #F9FAFB; padding: 30px; text-align: center; border-top: 1px solid #E5E7EB;">
-              <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 14px;">
-                <strong>Durotech Recruitment Ltd</strong>
-              </p>
-              <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 13px;">
-                123 Business Street, London, EC1A 1BB, United Kingdom
-              </p>
-              <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 13px;">
-                Phone: <a href="tel:+442012345678" style="color: #1E3A5F; text-decoration: none;">+44 20 1234 5678</a> | 
-                Email: <a href="mailto:info@durotech.co.uk" style="color: #1E3A5F; text-decoration: none;">info@durotech.co.uk</a>
-              </p>
-              <p style="margin: 15px 0 0 0; color: #9CA3AF; font-size: 12px;">
-                © ${new Date().getFullYear()} Durotech Recruitment Ltd. All rights reserved.
-              </p>
-            </td>
-          </tr>
-          
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-  `
-}
-
-export async function sendApplicationConfirmation(
-  applicantEmail: string,
-  applicantName: string,
-  jobTitle: string,
-): Promise<boolean> {
-  const content = `
-    <h2 style="margin: 0 0 20px 0; color: #1E3A5F; font-size: 24px;">Application Received!</h2>
-    <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-      Dear ${applicantName},
-    </p>
-    <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-      Thank you for applying for the <strong>${jobTitle}</strong> position with Durotech Recruitment. We have successfully received your application and our team is reviewing it carefully.
-    </p>
-    <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-      <strong>What happens next?</strong>
-    </p>
-    <ul style="margin: 0 0 15px 0; padding-left: 20px; color: #374151; font-size: 16px; line-height: 1.8;">
-      <li>Our recruitment team will review your application within 2-3 business days</li>
-      <li>If your profile matches our requirements, we'll contact you for an initial discussion</li>
-      <li>You may be asked to provide additional documents or attend an interview</li>
-    </ul>
-    <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-      If you have any questions in the meantime, please don't hesitate to contact us.
-    </p>
-    <p style="margin: 0; color: #374151; font-size: 16px; line-height: 1.6;">
-      Best regards,<br>
-      <strong>The Durotech Recruitment Team</strong>
-    </p>
+export async function sendApplicationConfirmation(email: string, name: string, jobTitle: string): Promise<boolean> {
+  const subject = `Application Received - ${jobTitle}`
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #1E3A5F; color: white; padding: 30px; text-align: center; }
+        .content { background: #f9f9f9; padding: 30px; }
+        .button { display: inline-block; padding: 12px 30px; background: #F5C547; color: #1E3A5F; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1 style="margin: 0;">Durotech Recruitment</h1>
+          <p style="margin: 10px 0 0 0;">Your Application Has Been Received</p>
+        </div>
+        <div class="content">
+          <h2>Dear ${name},</h2>
+          <p>Thank you for applying for the <strong>${jobTitle}</strong> position through Durotech Recruitment.</p>
+          <p>We have successfully received your application and our team will carefully review your qualifications. If your profile matches our requirements, we will contact you within the next 5-7 business days to discuss the next steps.</p>
+          <div style="background: white; padding: 20px; border-left: 4px solid #F5C547; margin: 20px 0;">
+            <h3 style="margin-top: 0;">What Happens Next?</h3>
+            <ul>
+              <li>Our recruitment team will review your CV and application</li>
+              <li>We'll assess your qualifications against the job requirements</li>
+              <li>Shortlisted candidates will be contacted for an interview</li>
+              <li>We'll keep you updated on your application status</li>
+            </ul>
+          </div>
+          <p>In the meantime, feel free to browse more opportunities on our website:</p>
+          <a href="${SITE_URL}/jobs" class="button">View More Jobs</a>
+          <p>If you have any questions, please don't hesitate to contact us at <a href="mailto:${FROM_EMAIL}">${FROM_EMAIL}</a>.</p>
+          <p>Best regards,<br><strong>The Durotech Recruitment Team</strong></p>
+        </div>
+        <div class="footer">
+          <p>Durotech Recruitment | London, United Kingdom</p>
+          <p>This is an automated email. Please do not reply directly to this message.</p>
+        </div>
+      </div>
+    </body>
+    </html>
   `
 
-  return sendEmail({
-    to: applicantEmail,
-    subject: `Application Received - ${jobTitle}`,
-    html: getEmailTemplate("Application Received", content, "View Job Details", "https://durotech.co.uk/jobs"),
-  })
+  return sendEmail(email, subject, html)
 }
 
 export async function sendAdminNotification(
@@ -159,58 +100,75 @@ export async function sendAdminNotification(
   jobTitle: string,
   applicationId: string,
 ): Promise<boolean> {
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@durotech.co.uk"
-
-  const content = `
-    <h2 style="margin: 0 0 20px 0; color: #1E3A5F; font-size: 24px;">New Application Received</h2>
-    <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-      A new application has been submitted on the Durotech Recruitment website.
-    </p>
-    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-      <tr>
-        <td style="padding: 12px; background-color: #F9FAFB; border: 1px solid #E5E7EB; font-weight: 600; color: #1E3A5F;">Applicant Name:</td>
-        <td style="padding: 12px; background-color: #FFFFFF; border: 1px solid #E5E7EB; color: #374151;">${applicantName}</td>
-      </tr>
-      <tr>
-        <td style="padding: 12px; background-color: #F9FAFB; border: 1px solid #E5E7EB; font-weight: 600; color: #1E3A5F;">Email:</td>
-        <td style="padding: 12px; background-color: #FFFFFF; border: 1px solid #E5E7EB; color: #374151;">${applicantEmail}</td>
-      </tr>
-      <tr>
-        <td style="padding: 12px; background-color: #F9FAFB; border: 1px solid #E5E7EB; font-weight: 600; color: #1E3A5F;">Position:</td>
-        <td style="padding: 12px; background-color: #FFFFFF; border: 1px solid #E5E7EB; color: #374151;">${jobTitle}</td>
-      </tr>
-      <tr>
-        <td style="padding: 12px; background-color: #F9FAFB; border: 1px solid #E5E7EB; font-weight: 600; color: #1E3A5F;">Application ID:</td>
-        <td style="padding: 12px; background-color: #FFFFFF; border: 1px solid #E5E7EB; color: #374151;">${applicationId}</td>
-      </tr>
-    </table>
-    <p style="margin: 20px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
-      Please review this application in the admin dashboard.
-    </p>
+  const subject = `New Application: ${jobTitle} - ${applicantName}`
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #1E3A5F; color: white; padding: 20px; }
+        .content { background: #f9f9f9; padding: 20px; }
+        .info-box { background: white; padding: 15px; margin: 15px 0; border-left: 4px solid #F5C547; }
+        .button { display: inline-block; padding: 12px 24px; background: #F5C547; color: #1E3A5F; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 15px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h2 style="margin: 0;">New Job Application</h2>
+        </div>
+        <div class="content">
+          <p><strong>A new application has been submitted:</strong></p>
+          <div class="info-box">
+            <p><strong>Position:</strong> ${jobTitle}</p>
+            <p><strong>Applicant:</strong> ${applicantName}</p>
+            <p><strong>Email:</strong> ${applicantEmail}</p>
+            <p><strong>Application ID:</strong> ${applicationId}</p>
+          </div>
+          <p>Please review the application in the admin dashboard:</p>
+          <a href="${SITE_URL}/admin/applications/${applicationId}" class="button">View Application</a>
+        </div>
+      </div>
+    </body>
+    </html>
   `
 
-  return sendEmail({
-    to: adminEmail,
-    subject: `🔔 New Application: ${jobTitle} - ${applicantName}`,
-    html: getEmailTemplate(
-      "New Application",
-      content,
-      "View in Dashboard",
-      `https://durotech.co.uk/admin/applications/${applicationId}`,
-    ),
-  })
+  return sendEmail(ADMIN_EMAIL, subject, html)
 }
 
 export async function sendCustomEmail(to: string, subject: string, message: string): Promise<boolean> {
-  const content = `
-    <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6; white-space: pre-wrap;">
-      ${message}
-    </p>
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #1E3A5F; color: white; padding: 20px; text-align: center; }
+        .content { background: #f9f9f9; padding: 30px; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h2 style="margin: 0;">Durotech Recruitment</h2>
+        </div>
+        <div class="content">
+          ${message}
+        </div>
+        <div class="footer">
+          <p>Durotech Recruitment | London, United Kingdom</p>
+          <p><a href="${SITE_URL}">${SITE_URL}</a></p>
+        </div>
+      </div>
+    </body>
+    </html>
   `
 
-  return sendEmail({
-    to,
-    subject,
-    html: getEmailTemplate(subject, content),
-  })
+  return sendEmail(to, subject, html)
 }
