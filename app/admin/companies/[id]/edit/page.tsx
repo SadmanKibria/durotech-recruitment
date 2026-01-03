@@ -7,6 +7,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { DeleteCompanyButton } from "@/components/admin/delete-company-button"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function EditCompanyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 

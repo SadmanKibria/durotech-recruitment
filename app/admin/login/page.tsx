@@ -56,9 +56,12 @@ export default function AdminLoginPage() {
         return
       }
 
-      router.push("/admin")
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      router.replace("/admin")
       router.refresh()
-    } catch {
+    } catch (err) {
+      console.error("[v0] Login error:", err)
       setError("An unexpected error occurred. Please try again.")
       setLoading(false)
     }

@@ -10,6 +10,9 @@ import { format } from "date-fns"
 import { CVStatusSelect } from "@/components/admin/cv-status-select"
 import { CVNotes } from "@/components/admin/cv-notes"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function TalentPoolDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()

@@ -2,17 +2,25 @@ import type React from "react"
 import { createClient } from "@/lib/supabase/server"
 import { AdminSidebar } from "@/components/admin/sidebar"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // Just check if we have a user for UI purposes
+  let user = null
 
-  // Allow login page without auth
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.auth.getUser()
+    user = data?.user
+  } catch (error) {
+    console.error("[v0] Admin layout auth error:", error)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {user ? (
