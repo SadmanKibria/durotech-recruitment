@@ -36,21 +36,6 @@ const nextConfig = {
       },
     ]
   },
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'www.durotech.co.uk',
-          },
-        ],
-        destination: 'https://durotech.co.uk/:path*',
-        permanent: true,
-      },
-    ]
-  },
 }
 
 export default nextConfig

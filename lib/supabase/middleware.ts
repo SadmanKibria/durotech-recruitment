@@ -29,31 +29,43 @@ export async function updateSession(request: NextRequest) {
   const isAdminLogin = pathname === "/admin/login"
   const isAdminRoute = pathname.startsWith("/admin")
 
-  await supabase.auth.getSession()
+  try {
+    await supabase.auth.getSession()
+  } catch (error) {
+    console.error("[v0] Session refresh error:", error)
+  }
 
   // Only enforce auth on admin routes (not login page)
   if (isAdminRoute && !isAdminLogin) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-    if (!user) {
-      const url = request.nextUrl.clone()
-      url.pathname = "/admin/login"
-      url.searchParams.set("redirectedFrom", pathname)
-      return NextResponse.redirect(url)
+      if (!user) {
+        const url = request.nextUrl.clone()
+        url.pathname = "/admin/login"
+        url.searchParams.set("redirectedFrom", pathname)
+        return NextResponse.redirect(url)
+      }
+    } catch (error) {
+      console.error("[v0] Auth check error:", error)
     }
   }
 
   if (isAdminLogin) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-    if (user) {
-      const url = request.nextUrl.clone()
-      url.pathname = "/admin"
-      return NextResponse.redirect(url)
+      if (user) {
+        const url = request.nextUrl.clone()
+        url.pathname = "/admin"
+        return NextResponse.redirect(url)
+      }
+    } catch (error) {
+      console.error("[v0] Login redirect check error:", error)
     }
   }
 
