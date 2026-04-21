@@ -16,7 +16,7 @@ export function JobCard({ job }: JobCardProps) {
     health: "bg-rose-50 text-rose-700 border-rose-200",
     engineering: "bg-blue-50 text-blue-700 border-blue-200",
     warehousing: "bg-violet-50 text-violet-700 border-violet-200",
-    garments: "bg-pink-50 text-pink-700 border-pink-200",
+    garments: "bg-cyan-50 text-cyan-700 border-cyan-200",
   }
 
   const currencySymbol = CURRENCIES[job.currency as keyof typeof CURRENCIES]?.split(" ")[0] || job.currency

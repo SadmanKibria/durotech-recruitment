@@ -13,9 +13,9 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <Image src="/durotech-logo.png" alt="Durotech" width={40} height={40} className="rounded-lg" />
+          <Image src="/durotech-logo.png" alt="Durotech" width={50} height={50} className="rounded-lg" />
           <span className="text-lg font-bold text-foreground">
-            Durotech<span className="text-primary"> Recruitment</span>
+            Durotech<span className="text-primary"> Group</span>
           </span>
         </Link>
 
@@ -25,6 +25,12 @@ export function Header() {
             className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
           >
             Home
+          </Link>
+          <Link
+            href="/training"
+            className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+          >
+            Training
           </Link>
           <Link
             href="/jobs"
@@ -87,6 +93,13 @@ export function Header() {
               onClick={() => setIsMenuOpen(false)}
             >
               Home
+            </Link>
+            <Link
+              href="/training"
+              className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Training
             </Link>
             <Link
               href="/jobs"
