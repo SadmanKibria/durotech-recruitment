@@ -62,12 +62,36 @@ export default function StudyAbroadPage() {
   }
 
   const destinations = [
-    { country: "United Kingdom", flag: "🇬🇧", programs: "MBA, Engineering, Medicine", universities: "150+" },
-    { country: "Germany", flag: "🇩🇪", programs: "Engineering, IT, Business", universities: "100+" },
-    { country: "Canada", flag: "🇨🇦", programs: "IT, Healthcare, Business", universities: "120+" },
-    { country: "Australia", flag: "🇦🇺", programs: "Medicine, Engineering, Arts", universities: "80+" },
-    { country: "USA", flag: "🇺🇸", programs: "Technology, Business, Sciences", universities: "200+" },
-    { country: "Ireland", flag: "🇮🇪", programs: "IT, Pharmacy, Business", universities: "40+" },
+    {
+      country: "Poland",
+      flag: "🇵🇱",
+      universities: ["WSN University", "UFM University", "Vistula University"],
+      programs: "Engineering, Business, IT",
+    },
+    {
+      country: "Albania",
+      flag: "🇦🇱",
+      universities: ["WBU University"],
+      programs: "Business, Economics",
+    },
+    {
+      country: "Malta",
+      flag: "🇲🇹",
+      universities: ["International European University", "LVI Malta", "ECI College"],
+      programs: "Business, Engineering, Arts",
+    },
+    {
+      country: "Ireland",
+      flag: "🇮🇪",
+      universities: ["Dublin City University", "International College of Technology", "Dublin Business School"],
+      programs: "IT, Pharmacy, Business",
+    },
+    {
+      country: "United Kingdom",
+      flag: "🇬🇧",
+      universities: ["University of East London", "University of Greenwich", "Coventry University", "University of Bedfordshire", "University of Cumbria", "London Metropolitan University"],
+      programs: "Engineering, Medicine, Business",
+    },
   ]
 
   const services = [
@@ -213,14 +237,27 @@ export default function StudyAbroadPage() {
                       <span className="text-4xl">{dest.flag}</span>
                       <div>
                         <CardTitle className="text-lg">{dest.country}</CardTitle>
-                        <CardDescription>{dest.universities} Universities</CardDescription>
+                        <CardDescription>{dest.universities.length} Top Universities</CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground">Popular Programs:</span> {dest.programs}
-                    </p>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm font-medium text-foreground mb-2">Featured Universities:</p>
+                        <ul className="space-y-1">
+                          {dest.universities.map((uni) => (
+                            <li key={uni} className="text-sm text-muted-foreground flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                              {uni}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <p className="text-sm text-muted-foreground pt-2 border-t">
+                        <span className="font-medium text-foreground">Programs:</span> {dest.programs}
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               ))}

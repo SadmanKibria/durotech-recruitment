@@ -5,13 +5,13 @@ import { Globe, Users, Award, Target, CheckCircle, MapPin, Phone, Mail, Building
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "About Us - International Recruitment Experts",
+  title: "About Us - Durotech Group",
   description:
-    "Learn about Durotech Recruitment, London's leading international staffing agency with 15+ years experience connecting professionals with employers across Europe, Middle East, and Asia.",
+    "Learn about Durotech Group, a leading global staffing agency with 15+ years experience connecting professionals with employers across Europe, Middle East, and Asia.",
   openGraph: {
-    title: "About Durotech Recruitment",
+    title: "About Durotech Group",
     description:
-      "15+ years of international recruitment excellence. Connecting talent with opportunities across 30+ countries.",
+      "15+ years of worldwide employment excellence. Connecting talent with opportunities across 30+ countries.",
   },
 }
 
@@ -57,11 +57,11 @@ export default function AboutPage() {
         <section className="bg-gradient-to-br from-[#1E3A5F] to-[#2C5282] py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
-              <h1 className="text-4xl font-bold text-white md:text-5xl text-balance">About Durotech Recruitment</h1>
+              <h1 className="text-4xl font-bold text-white md:text-5xl text-balance">About Durotech Group</h1>
               <p className="mt-6 text-lg text-blue-100 leading-relaxed">
                 For over 15 years, we have been connecting talented professionals with leading employers across the
-                globe. Our expertise spans multiple industries and regions, making us your trusted partner in
-                international recruitment.
+                globe. Our expertise spans multiple industries and regions, making us your trusted partner in worldwide
+                employment and professional development.
               </p>
             </div>
           </div>
@@ -179,6 +179,47 @@ export default function AboutPage() {
                   </li>
                 ))}
               </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Industry Partnerships */}
+        <section className="py-16 md:py-24 bg-slate-50">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <span className="text-sm font-semibold text-[#F5C547] uppercase tracking-wider">Industry Leaders</span>
+              <h2 className="mt-2 text-3xl font-bold text-foreground">Strong Presence in Key Industries</h2>
+              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+                We partner with industry leaders to bring expertise and excellence to every placement
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+              <Card className="border-2 border-[#F5C547]/30 hover:border-[#F5C547] transition-colors">
+                <CardContent className="pt-8 pb-6 text-center">
+                  <h3 className="font-semibold text-foreground mb-3">Construction & Engineering</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Skilled trades and infrastructure professionals</p>
+                  <p className="text-xs text-slate-500">Connecting specialists with major projects</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-[#F5C547]/30 hover:border-[#F5C547] transition-colors relative md:scale-105 md:z-10">
+                <CardContent className="pt-8 pb-6 text-center">
+                  <a href="https://www.alnajmalzaher.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#F5C547] transition-colors">
+                    <h3 className="font-semibold text-foreground mb-3">Featured Partner</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Al Najmal Al Zaher</p>
+                    <p className="text-xs text-[#F5C547] font-medium">Industry Excellence Partner</p>
+                  </a>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-[#F5C547]/30 hover:border-[#F5C547] transition-colors">
+                <CardContent className="pt-8 pb-6 text-center">
+                  <h3 className="font-semibold text-foreground mb-3">Healthcare & Wellbeing</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Care professionals and medical staff</p>
+                  <p className="text-xs text-slate-500">Supporting quality care delivery</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>

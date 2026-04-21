@@ -1,174 +1,262 @@
-const MAILEROO_API_KEY = process.env.MAILEROO_API_KEY
-const FROM_EMAIL = process.env.FROM_EMAIL || "info@durotech.co.uk"
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@durotech.co.uk"
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://durotech.co.uk"
+/**
+ * Email notification service for Durotech Group
+ * Handles sending application confirmations and admin notifications via Maileroo
+ */
 
-interface MailerooResponse {
-  success: boolean
-  message?: string
+const ADMIN_EMAIL = "info@durotech.co.uk"
+const FROM_EMAIL = "noreply@durotech.co.uk"
+
+function generateApplicationConfirmationHtml(applicantName: string, jobTitle: string): string {
+  return `
+    <html>
+      <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; padding: 30px;">
+          <h1 style="color: #1E3A5F; border-bottom: 3px solid #F5C547; padding-bottom: 10px;">Durotech Group</h1>
+          
+          <h2 style="color: #1E3A5F; margin-top: 20px;">Thank You for Your Application!</h2>
+          
+          <p style="color: #333; line-height: 1.6;">Dear ${applicantName},</p>
+          
+          <p style="color: #333; line-height: 1.6;">
+            Thank you for applying for the position of <strong>${jobTitle}</strong> with Durotech Group. 
+            We have received your application and appreciate your interest in joining our team.
+          </p>
+          
+          <div style="background-color: #f9f9f9; border-left: 4px solid #F5C547; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; color: #666; font-size: 14px;">
+              <strong>What happens next?</strong><br/>
+              Our recruitment team will review your application and contact you within 5-7 working days if you meet the requirements for the next stage.
+            </p>
+          </div>
+          
+          <p style="color: #333; line-height: 1.6;">
+            If you have any questions, please don't hesitate to reach out to us.
+          </p>
+          
+          <p style="color: #333; line-height: 1.6;">
+            Best regards,<br/>
+            <strong>The Durotech Group Team</strong>
+          </p>
+          
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+          
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            Durotech Group | info@durotech.co.uk | +44 7950 206007<br/>
+            London, United Kingdom
+          </p>
+        </div>
+      </body>
+    </html>
+  `
 }
 
-async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
-  if (!MAILEROO_API_KEY) {
-    console.error("[MAILEROO] API key not configured")
-    return false
+function generateAdminNotificationHtml(
+  applicantName: string,
+  applicantEmail: string,
+  jobTitle: string,
+  applicationId: string
+): string {
+  return `
+    <html>
+      <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; padding: 30px;">
+          <h1 style="color: #1E3A5F; border-bottom: 3px solid #F5C547; padding-bottom: 10px;">New Application Alert</h1>
+          
+          <div style="background-color: #e3f2fd; border-left: 4px solid #1E3A5F; padding: 15px; margin: 20px 0;">
+            <h2 style="margin: 0 0 10px 0; color: #1E3A5F;">Application Details</h2>
+            <p style="margin: 5px 0; color: #333;"><strong>Job Title:</strong> ${jobTitle}</p>
+            <p style="margin: 5px 0; color: #333;"><strong>Applicant:</strong> ${applicantName}</p>
+            <p style="margin: 5px 0; color: #333;"><strong>Email:</strong> ${applicantEmail}</p>
+            <p style="margin: 5px 0; color: #333;"><strong>Application ID:</strong> ${applicationId}</p>
+            <p style="margin: 5px 0; color: #666; font-size: 12px;"><strong>Received:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+          
+          <p style="color: #333; line-height: 1.6;">
+            A new application has been received and is awaiting review. Log in to the admin dashboard to view and manage the application.
+          </p>
+          
+          <a href="https://durotech.co.uk/admin/applications/${applicationId}" 
+             style="display: inline-block; background-color: #F5C547; color: #1E3A5F; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin: 20px 0; font-weight: bold;">
+            View Application
+          </a>
+          
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+          
+          <p style="color: #999; font-size: 12px;">
+            This is an automated notification from Durotech Group Admin System.
+          </p>
+        </div>
+      </body>
+    </html>
+  `
+}
+
+function generateStatusUpdateHtml(
+  applicantName: string,
+  jobTitle: string,
+  newStatus: string
+): string {
+  const statusMessages: Record<string, { message: string; color: string }> = {
+    applied: { message: "Your application has been received", color: "#2196F3" },
+    shortlisted: {
+      message: "Congratulations! You have been shortlisted",
+      color: "#4CAF50",
+    },
+    interview: {
+      message: "You are invited for an interview",
+      color: "#4CAF50",
+    },
+    accepted: {
+      message: "Congratulations! Your application has been accepted",
+      color: "#4CAF50",
+    },
+    rejected: {
+      message: "Unfortunately, your application was not successful",
+      color: "#f44336",
+    },
+    on_hold: { message: "Your application is on hold", color: "#FF9800" },
   }
 
+  const statusInfo = statusMessages[newStatus] || {
+    message: "Your application status has been updated",
+    color: "#2196F3",
+  }
+
+  return `
+    <html>
+      <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; padding: 30px;">
+          <h1 style="color: #1E3A5F; border-bottom: 3px solid #F5C547; padding-bottom: 10px;">Durotech Group</h1>
+          
+          <h2 style="color: #1E3A5F; margin-top: 20px;">Application Status Update</h2>
+          
+          <p style="color: #333; line-height: 1.6;">Dear ${applicantName},</p>
+          
+          <div style="background-color: #f0f8f0; border-left: 4px solid ${statusInfo.color}; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; color: #333;"><strong>${statusInfo.message}</strong></p>
+            <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">Position: ${jobTitle}</p>
+          </div>
+          
+          <p style="color: #333; line-height: 1.6;">
+            We appreciate your interest in Durotech Group. If you have any questions about your application status, 
+            please don't hesitate to contact our recruitment team.
+          </p>
+          
+          <p style="color: #333; line-height: 1.6;">
+            Best regards,<br/>
+            <strong>The Durotech Group Team</strong>
+          </p>
+          
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+          
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            Durotech Group | info@durotech.co.uk | +44 7950 206007<br/>
+            London, United Kingdom
+          </p>
+        </div>
+      </body>
+    </html>
+  `
+}
+
+export async function sendApplicationConfirmation(
+  applicantEmail: string,
+  applicantName: string,
+  jobTitle: string
+): Promise<void> {
   try {
-    const response = await fetch("https://smtp.maileroo.com/send", {
+    const response = await fetch("/api/send-email", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": MAILEROO_API_KEY,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        to: applicantEmail,
+        subject: `Application Received - ${jobTitle}`,
+        html: generateApplicationConfirmationHtml(applicantName, jobTitle),
         from: FROM_EMAIL,
-        to: [to],
-        subject,
-        html,
       }),
     })
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error("[MAILEROO] Send failed:", response.status, errorText)
-      return false
+      console.error("Failed to send confirmation email:", response.statusText)
     }
-
-    return true
   } catch (error) {
-    console.error("[MAILEROO] Error:", error)
-    return false
+    console.error("Error sending confirmation email:", error)
   }
-}
-
-export async function sendApplicationConfirmation(email: string, name: string, jobTitle: string): Promise<boolean> {
-  const subject = `Application Received - ${jobTitle}`
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #1E3A5F; color: white; padding: 30px; text-align: center; }
-        .content { background: #f9f9f9; padding: 30px; }
-        .button { display: inline-block; padding: 12px 30px; background: #F5C547; color: #1E3A5F; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1 style="margin: 0;">Durotech Recruitment</h1>
-          <p style="margin: 10px 0 0 0;">Your Application Has Been Received</p>
-        </div>
-        <div class="content">
-          <h2>Dear ${name},</h2>
-          <p>Thank you for applying for the <strong>${jobTitle}</strong> position through Durotech Recruitment.</p>
-          <p>We have successfully received your application and our team will carefully review your qualifications. If your profile matches our requirements, we will contact you within the next 5-7 business days to discuss the next steps.</p>
-          <div style="background: white; padding: 20px; border-left: 4px solid #F5C547; margin: 20px 0;">
-            <h3 style="margin-top: 0;">What Happens Next?</h3>
-            <ul>
-              <li>Our recruitment team will review your CV and application</li>
-              <li>We'll assess your qualifications against the job requirements</li>
-              <li>Shortlisted candidates will be contacted for an interview</li>
-              <li>We'll keep you updated on your application status</li>
-            </ul>
-          </div>
-          <p>In the meantime, feel free to browse more opportunities on our website:</p>
-          <a href="${SITE_URL}/jobs" class="button">View More Jobs</a>
-          <p>If you have any questions, please don't hesitate to contact us at <a href="mailto:${FROM_EMAIL}">${FROM_EMAIL}</a>.</p>
-          <p>Best regards,<br><strong>The Durotech Recruitment Team</strong></p>
-        </div>
-        <div class="footer">
-          <p>Durotech Recruitment | London, United Kingdom</p>
-          <p>This is an automated email. Please do not reply directly to this message.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-
-  return sendEmail(email, subject, html)
 }
 
 export async function sendAdminNotification(
   applicantName: string,
   applicantEmail: string,
   jobTitle: string,
-  applicationId: string,
-): Promise<boolean> {
-  const subject = `New Application: ${jobTitle} - ${applicantName}`
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #1E3A5F; color: white; padding: 20px; }
-        .content { background: #f9f9f9; padding: 20px; }
-        .info-box { background: white; padding: 15px; margin: 15px 0; border-left: 4px solid #F5C547; }
-        .button { display: inline-block; padding: 12px 24px; background: #F5C547; color: #1E3A5F; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 15px 0; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h2 style="margin: 0;">New Job Application</h2>
-        </div>
-        <div class="content">
-          <p><strong>A new application has been submitted:</strong></p>
-          <div class="info-box">
-            <p><strong>Position:</strong> ${jobTitle}</p>
-            <p><strong>Applicant:</strong> ${applicantName}</p>
-            <p><strong>Email:</strong> ${applicantEmail}</p>
-            <p><strong>Application ID:</strong> ${applicationId}</p>
-          </div>
-          <p>Please review the application in the admin dashboard:</p>
-          <a href="${SITE_URL}/admin/applications/${applicationId}" class="button">View Application</a>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
+  applicationId: string
+): Promise<void> {
+  try {
+    const response = await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: ADMIN_EMAIL,
+        subject: `New Application Received - ${jobTitle}`,
+        html: generateAdminNotificationHtml(applicantName, applicantEmail, jobTitle, applicationId),
+        from: FROM_EMAIL,
+      }),
+    })
 
-  return sendEmail(ADMIN_EMAIL, subject, html)
+    if (!response.ok) {
+      console.error("Failed to send admin notification:", response.statusText)
+    }
+  } catch (error) {
+    console.error("Error sending admin notification:", error)
+  }
 }
 
-export async function sendCustomEmail(to: string, subject: string, message: string): Promise<boolean> {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #1E3A5F; color: white; padding: 20px; text-align: center; }
-        .content { background: #f9f9f9; padding: 30px; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h2 style="margin: 0;">Durotech Recruitment</h2>
-        </div>
-        <div class="content">
-          ${message}
-        </div>
-        <div class="footer">
-          <p>Durotech Recruitment | London, United Kingdom</p>
-          <p><a href="${SITE_URL}">${SITE_URL}</a></p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
+export async function sendStatusUpdateEmail(
+  applicantEmail: string,
+  applicantName: string,
+  jobTitle: string,
+  newStatus: string
+): Promise<void> {
+  try {
+    const response = await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: applicantEmail,
+        subject: `Application Status Update - ${jobTitle}`,
+        html: generateStatusUpdateHtml(applicantName, jobTitle, newStatus),
+        from: FROM_EMAIL,
+      }),
+    })
 
-  return sendEmail(to, subject, html)
+    if (!response.ok) {
+      console.error("Failed to send status update email:", response.statusText)
+    }
+  } catch (error) {
+    console.error("Error sending status update email:", error)
+  }
+}
+
+export async function sendCustomEmail(
+  to: string,
+  subject: string,
+  html: string
+): Promise<void> {
+  try {
+    const response = await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to,
+        subject,
+        html,
+        from: FROM_EMAIL,
+      }),
+    })
+
+    if (!response.ok) {
+      console.error("Failed to send custom email:", response.statusText)
+    }
+  } catch (error) {
+    console.error("Error sending custom email:", error)
+  }
 }
