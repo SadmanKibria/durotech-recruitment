@@ -239,8 +239,8 @@ export async function sendStatusUpdateEmail(
 export async function sendCustomEmail(
   to: string,
   subject: string,
-  html: string
-): Promise<void> {
+  htmlContent: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     const response = await fetch("/api/send-email", {
       method: "POST",
@@ -248,15 +248,31 @@ export async function sendCustomEmail(
       body: JSON.stringify({
         to,
         subject,
-        html,
+        html: `
+          <html>
+            <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
+              <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; padding: 30px;">
+                <h1 style="color: #1E3A5F; border-bottom: 3px solid #F5C547; padding-bottom: 10px;">Durotech Group</h1>
+                ${htmlContent}
+                <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+                <p style="color: #999; font-size: 12px; text-align: center;">
+                  Durotech Group | info@durotech.co.uk | +44 7950 206007<br/>
+                  London, United Kingdom
+                </p>
+              </div>
+            </body>
+          </html>
+        `,
         from: FROM_EMAIL,
       }),
     })
 
     if (!response.ok) {
-      console.error("Failed to send custom email:", response.statusText)
+      return { success: false, error: response.statusText }
     }
+    
+    return { success: true }
   } catch (error) {
-    console.error("Error sending custom email:", error)
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
   }
 }

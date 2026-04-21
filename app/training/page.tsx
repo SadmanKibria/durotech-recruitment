@@ -21,19 +21,6 @@ import {
   Building2,
   Heart,
 } from "lucide-react"
-import type { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Professional Training Programs - Durotech Group",
-  description:
-    "Develop your skills with Durotech Group. Professional training in health and social care, IT, cyber security, and more.",
-  openGraph: {
-    title: "Professional Training - Durotech Group",
-    description:
-      "Advance your career with world-class professional training programs. Health & Social Care, IT, Cyber Security, and more.",
-  },
-}
-
 export default function TrainingPage() {
   const [currentSlide, setCurrentSlide] = useState(0)
 
@@ -187,7 +174,10 @@ export default function TrainingPage() {
                 {/* Carousel Visual */}
                 <div className="hidden lg:flex items-center justify-center">
                   <div className={`w-full h-80 rounded-2xl bg-gradient-to-br ${carouselSlides[currentSlide].gradient} flex items-center justify-center transform transition-all duration-500`}>
-                    <carouselSlides[currentSlide].icon className="h-32 w-32 text-white opacity-50" />
+                    {(() => {
+                      const IconComponent = carouselSlides[currentSlide].icon
+                      return <IconComponent className="h-32 w-32 text-white opacity-50" />
+                    })()}
                   </div>
                 </div>
               </div>
