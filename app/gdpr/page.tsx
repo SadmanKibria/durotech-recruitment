@@ -118,7 +118,7 @@ export default function GDPRPage() {
                   EC1A 1BB, UK
                 </li>
                 <li>
-                  <strong>Phone:</strong> +44 20 1234 5678
+                  <strong>Phone:</strong> +44 7950 206007
                 </li>
               </ul>
               <p className="text-muted-foreground mb-4">

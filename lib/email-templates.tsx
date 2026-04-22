@@ -73,7 +73,7 @@ export function getApplicationConfirmationEmail(applicantName: string, jobTitle:
                 123 Business Street, London, EC1A 1BB, United Kingdom
               </p>
               <p style="margin: 10px 0; color: #6B7280; font-size: 13px;">
-                Phone: +44 20 1234 5678 | Email: info@durotech.co.uk
+                Phone: +44 7950 206007 | Email: info@durotech.co.uk
               </p>
               <p style="margin: 10px 0 0 0; color: #9CA3AF; font-size: 12px;">
                 © ${new Date().getFullYear()} Durotech Recruitment. All rights reserved.
@@ -222,7 +222,7 @@ export function getCustomEmail(recipientName: string, subject: string, message: 
                 123 Business Street, London, EC1A 1BB, United Kingdom
               </p>
               <p style="margin: 10px 0; color: #6B7280; font-size: 13px;">
-                Phone: +44 20 1234 5678 | Email: info@durotech.co.uk
+                Phone: +44 7950 206007 | Email: info@durotech.co.uk
               </p>
               <p style="margin: 10px 0 0 0; color: #9CA3AF; font-size: 12px;">
                 © ${new Date().getFullYear()} Durotech Recruitment. All rights reserved.

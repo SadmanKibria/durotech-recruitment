@@ -119,7 +119,7 @@ export default function TermsOfServicePage() {
                 <br />
                 Email: legal@durotechrecruitment.com
                 <br />
-                Phone: +44 20 1234 5678
+                Phone: +44 7950 206007
               </p>
             </div>
           </div>

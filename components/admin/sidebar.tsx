@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus, ExternalLink, Inbox, Building2 } from "lucide-react"
+import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus, ExternalLink, Inbox, Building2, UserCog } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 const navItems = [
@@ -14,6 +14,7 @@ const navItems = [
   { href: "/admin/applications", label: "Applications", icon: Users },
   { href: "/admin/talent-pool", label: "Talent Pool", icon: Inbox },
   { href: "/admin/companies", label: "Companies", icon: Building2 },
+  { href: "/admin/agents", label: "Agents", icon: UserCog },
 ]
 
 export function AdminSidebar({ user }: { user: User }) {
