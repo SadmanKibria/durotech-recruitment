@@ -109,7 +109,7 @@ export function getApplicationConfirmationEmail(applicantName: string, jobTitle:
                   <td style="background-color: #1E3A5F; padding: 30px; text-align: center;">
                     <p style="margin: 0 0 10px 0; color: #F5C547; font-size: 14px; font-weight: bold;">Contact Us</p>
                     <p style="margin: 0 0 5px 0; color: #ffffff; font-size: 13px;">
-                      📧 info@durotech.co.uk | 📞 +44 20 1234 5678
+                      📧 info@durotech.co.uk | 📞 +44 7950 206007
                     </p>
                     <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 13px;">
                       123 Business Street, London, EC1A 1BB, United Kingdom
