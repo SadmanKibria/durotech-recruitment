@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Plus, Phone, Mail, Building2, Percent, UserCog } from "lucide-react"
+import { Plus, Phone, Mail, Building2, Percent, UserCog, DollarSign } from "lucide-react"
 import Link from "next/link"
 
 export const dynamic = "force-dynamic"
@@ -27,15 +27,18 @@ export default async function AgentsPage() {
     .select("*")
     .order("created_at", { ascending: false })
 
-  // Get application counts for each agent
-  const { data: applicationCounts } = await supabase
+  // Get application counts and financial data for each agent
+  const { data: applicationData } = await supabase
     .from("applications")
-    .select("agent_id")
+    .select("agent_id, total_agreed_amount")
   
   const agentApplicationCounts: Record<string, number> = {}
-  applicationCounts?.forEach((app) => {
+  const agentTotalAgreed: Record<string, number> = {}
+  
+  applicationData?.forEach((app) => {
     if (app.agent_id) {
       agentApplicationCounts[app.agent_id] = (agentApplicationCounts[app.agent_id] || 0) + 1
+      agentTotalAgreed[app.agent_id] = (agentTotalAgreed[app.agent_id] || 0) + (app.total_agreed_amount || 0)
     }
   })
 
@@ -90,15 +93,25 @@ export default async function AgentsPage() {
                       {agent.phone}
                     </div>
                   )}
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <div className="flex items-center gap-1 text-sm">
-                      <Percent className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{agent.commission_rate || 0}%</span>
-                      <span className="text-muted-foreground">commission</span>
+                  <div className="space-y-2 pt-2 border-t">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1 text-sm">
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">Total Agreed:</span>
+                      </div>
+                      <span className="font-bold text-primary">
+                        £{(agentTotalAgreed[agent.id] || 0).toFixed(2)}
+                      </span>
                     </div>
-                    <Badge variant="outline">
-                      {agentApplicationCounts[agent.id] || 0} applications
-                    </Badge>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1 text-sm">
+                        <Percent className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">{agent.commission_rate || 0}% Commission</span>
+                      </div>
+                      <Badge variant="outline">
+                        {agentApplicationCounts[agent.id] || 0} apps
+                      </Badge>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

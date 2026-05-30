@@ -106,7 +106,7 @@ export function Footer() {
             <ul className="mt-4 space-y-3">
               <li className="flex items-center gap-2 text-sm text-slate-300">
                 <Mail className="h-4 w-4 flex-shrink-0 text-[#F5C547]" />
-                <span>info@durotechrecruitment.com</span>
+                <span>info@durotech.co.uk</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-slate-300">
                 <Phone className="h-4 w-4 flex-shrink-0 text-[#F5C547]" />
