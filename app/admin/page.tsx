@@ -2,11 +2,11 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Briefcase, Users, CheckCircle, Clock, ArrowRight, Inbox, TrendingUp, Building2, DollarSign, TrendingDown } from "lucide-react"
+import { Briefcase, Users, CheckCircle, Clock, ArrowRight, Inbox, TrendingUp } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { APPLICATION_STATUSES } from "@/lib/types"
-import { DashboardCharts } from "@/components/admin/dashboard-charts"
+import { DashboardFinancialSummary } from "@/components/admin/dashboard-financial-summary"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -46,9 +46,7 @@ export default async function AdminDashboardPage() {
     totalCVs = 0,
     newCVs = 0
   let recentApplications: any[] = []
-  let allApplications: any[] = []
-  let totalIncome = 0,
-    totalExpenses = 0
+  let payments: any[] = []
 
   try {
     const [
@@ -59,7 +57,6 @@ export default async function AdminDashboardPage() {
       cvsResult,
       newCvsResult,
       recentResult,
-      allAppsResult,
       paymentsResult,
     ] = await Promise.all([
       supabase.from("jobs").select("*", { count: "exact", head: true }),
@@ -69,7 +66,6 @@ export default async function AdminDashboardPage() {
       supabase.from("speculative_cvs").select("*", { count: "exact", head: true }),
       supabase.from("speculative_cvs").select("*", { count: "exact", head: true }).eq("status", "new"),
       supabase.from("applications").select("*, job:jobs(*)").order("created_at", { ascending: false }).limit(5),
-      supabase.from("applications").select("*, job:jobs(company_name, industry, region)"),
       supabase.from("application_payments").select("*"),
     ])
 
@@ -80,65 +76,12 @@ export default async function AdminDashboardPage() {
     totalCVs = cvsResult.count || 0
     newCVs = newCvsResult.count || 0
     recentApplications = recentResult.data || []
-    allApplications = allAppsResult.data || []
-
-    // Calculate financial totals
-    const payments = paymentsResult.data || []
-    totalIncome = payments
-      .filter((p: any) => p.payment_type === "incoming")
-      .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
-    totalExpenses = payments
-      .filter((p: any) => p.payment_type === "outgoing")
-      .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
+    payments = paymentsResult.data || []
   } catch (error) {
     console.error("Data fetch error:", error)
   }
 
-  // Process data for charts
-  const companyBreakdown: Record<string, number> = {}
-  const industryBreakdown: Record<string, number> = {}
-  const regionBreakdown: Record<string, number> = {}
 
-  allApplications.forEach((app) => {
-    if (app.job?.company_name) {
-      companyBreakdown[app.job.company_name] = (companyBreakdown[app.job.company_name] || 0) + 1
-    }
-    if (app.job?.industry) {
-      industryBreakdown[app.job.industry] = (industryBreakdown[app.job.industry] || 0) + 1
-    }
-    if (app.job?.region) {
-      regionBreakdown[app.job.region] = (regionBreakdown[app.job.region] || 0) + 1
-    }
-  })
-
-  const companyData = Object.entries(companyBreakdown)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
-
-  const industryData = Object.entries(industryBreakdown).map(([name, value]) => ({ name, value }))
-
-  const regionData = Object.entries(regionBreakdown).map(([name, value]) => ({ name, value }))
-
-  // Monthly data (last 6 months)
-  const monthlyData = []
-  for (let i = 5; i >= 0; i--) {
-    const date = new Date()
-    date.setMonth(date.getMonth() - i)
-    const month = date.toLocaleDateString("en-US", { month: "short" })
-    const applications = allApplications.filter((app) => {
-      const appDate = new Date(app.created_at)
-      return appDate.getMonth() === date.getMonth() && appDate.getFullYear() === date.getFullYear()
-    }).length
-    const placements = allApplications.filter((app) => {
-      const appDate = new Date(app.created_at)
-      return (
-        app.status === "arrived" &&
-        appDate.getMonth() === date.getMonth() &&
-        appDate.getFullYear() === date.getFullYear()
-      )
-    }).length
-    monthlyData.push({ month, applications, placements })
-  }
 
   const stats = [
     {
@@ -240,154 +183,48 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Financial Overview */}
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-        {/* Total Income */}
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Income
-              </CardTitle>
-              <TrendingUp className="h-4 w-4 text-green-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-green-600">
-              £{totalIncome.toFixed(2)}
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Money received from applications
-            </p>
-          </CardContent>
-        </Card>
+      {/* Financial Summary */}
+      <DashboardFinancialSummary payments={payments} />
 
-        {/* Total Expenses */}
-        <Card className="border-l-4 border-l-red-500">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Expenses
-              </CardTitle>
-              <TrendingDown className="h-4 w-4 text-red-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-red-600">
-              £{totalExpenses.toFixed(2)}
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Fees, visa costs, and expenses
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Net Profit/Loss */}
-        <Card className={`border-l-4 ${totalIncome - totalExpenses >= 0 ? "border-l-blue-500" : "border-l-orange-500"}`}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Net Profit
-              </CardTitle>
-              <DollarSign className={`h-4 w-4 ${totalIncome - totalExpenses >= 0 ? "text-blue-600" : "text-orange-600"}`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className={`text-3xl font-bold ${totalIncome - totalExpenses >= 0 ? "text-blue-600" : "text-orange-600"}`}>
-              £{(totalIncome - totalExpenses).toFixed(2)}
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              {totalIncome - totalExpenses >= 0 ? "Overall profit" : "Overall loss"}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Recent Applications */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <CardTitle className="text-lg">Recent Applications</CardTitle>
-            <Link href="/admin/applications">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                View all
-                <ArrowRight className="ml-1 h-4 w-4" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {recentApplications && recentApplications.length > 0 ? (
-              <div className="space-y-3">
-                {recentApplications.map((app) => (
-                  <Link
-                    key={app.id}
-                    href={`/admin/applications/${app.id}`}
-                    className="flex flex-col p-3 border rounded-lg hover:bg-muted/50 transition-colors gap-2"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium truncate text-sm">{app.name}</p>
-                      <Badge variant="outline" className={`${getStatusBadge(app.status)} text-xs`}>
-                        {APPLICATION_STATUSES[app.status as keyof typeof APPLICATION_STATUSES] || app.status}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground truncate">{app.job?.title || "Unknown Job"}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(app.created_at).toLocaleDateString()}</p>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="py-8 text-center">
-                <Users className="mx-auto h-10 w-10 text-muted-foreground/50" />
-                <p className="mt-2 text-sm text-muted-foreground">No applications yet</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Top Companies */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              Top Companies
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {companyData.length > 0 ? (
-              <div className="space-y-3">
-                {companyData.slice(0, 5).map((company, index) => (
-                  <div key={company.name} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                        {index + 1}
-                      </div>
-                      <span className="font-medium text-sm">{company.name}</span>
-                    </div>
-                    <Badge variant="secondary" className="text-sm">
-                      {company.count} application{company.count !== 1 ? "s" : ""}
+      {/* Recent Applications */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <CardTitle className="text-lg">Recent Applications</CardTitle>
+          <Link href="/admin/applications">
+            <Button variant="ghost" size="sm" className="text-muted-foreground">
+              View all
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Button>
+          </Link>
+        </CardHeader>
+        <CardContent>
+          {recentApplications && recentApplications.length > 0 ? (
+            <div className="space-y-3">
+              {recentApplications.map((app) => (
+                <Link
+                  key={app.id}
+                  href={`/admin/applications/${app.id}`}
+                  className="flex flex-col p-3 border rounded-lg hover:bg-muted/50 transition-colors gap-2"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-medium truncate text-sm">{app.name}</p>
+                    <Badge variant="outline" className={`${getStatusBadge(app.status)} text-xs`}>
+                      {APPLICATION_STATUSES[app.status as keyof typeof APPLICATION_STATUSES] || app.status}
                     </Badge>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="py-8 text-center">
-                <Building2 className="mx-auto h-10 w-10 text-muted-foreground/50" />
-                <p className="mt-2 text-sm text-muted-foreground">No application data yet</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts */}
-      {allApplications.length > 0 && (
-        <DashboardCharts
-          companyData={companyData}
-          industryData={industryData}
-          regionData={regionData}
-          monthlyData={monthlyData}
-        />
-      )}
+                  <p className="text-xs text-muted-foreground truncate">{app.job?.title || "Unknown Job"}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(app.created_at).toLocaleDateString()}</p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center">
+              <Users className="mx-auto h-10 w-10 text-muted-foreground/50" />
+              <p className="mt-2 text-sm text-muted-foreground">No applications yet</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
