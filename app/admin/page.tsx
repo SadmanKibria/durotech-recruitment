@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Briefcase, Users, CheckCircle, Clock, ArrowRight, Inbox, TrendingUp, Building2 } from "lucide-react"
+import { Briefcase, Users, CheckCircle, Clock, ArrowRight, Inbox, TrendingUp, Building2, DollarSign, TrendingDown } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { APPLICATION_STATUSES } from "@/lib/types"
@@ -47,6 +47,8 @@ export default async function AdminDashboardPage() {
     newCVs = 0
   let recentApplications: any[] = []
   let allApplications: any[] = []
+  let totalIncome = 0,
+    totalExpenses = 0
 
   try {
     const [
@@ -58,6 +60,7 @@ export default async function AdminDashboardPage() {
       newCvsResult,
       recentResult,
       allAppsResult,
+      paymentsResult,
     ] = await Promise.all([
       supabase.from("jobs").select("*", { count: "exact", head: true }),
       supabase.from("jobs").select("*", { count: "exact", head: true }).eq("is_active", true),
@@ -67,6 +70,7 @@ export default async function AdminDashboardPage() {
       supabase.from("speculative_cvs").select("*", { count: "exact", head: true }).eq("status", "new"),
       supabase.from("applications").select("*, job:jobs(*)").order("created_at", { ascending: false }).limit(5),
       supabase.from("applications").select("*, job:jobs(company_name, industry, region)"),
+      supabase.from("application_payments").select("*"),
     ])
 
     totalJobs = jobsResult.count || 0
@@ -77,6 +81,15 @@ export default async function AdminDashboardPage() {
     newCVs = newCvsResult.count || 0
     recentApplications = recentResult.data || []
     allApplications = allAppsResult.data || []
+
+    // Calculate financial totals
+    const payments = paymentsResult.data || []
+    totalIncome = payments
+      .filter((p: any) => p.payment_type === "incoming")
+      .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
+    totalExpenses = payments
+      .filter((p: any) => p.payment_type === "outgoing")
+      .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
   } catch (error) {
     console.error("Data fetch error:", error)
   }
@@ -225,6 +238,69 @@ export default async function AdminDashboardPage() {
             </Card>
           </Link>
         ))}
+      </div>
+
+      {/* Financial Overview */}
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+        {/* Total Income */}
+        <Card className="border-l-4 border-l-green-500">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Income
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold text-green-600">
+              £{totalIncome.toFixed(2)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Money received from applications
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Total Expenses */}
+        <Card className="border-l-4 border-l-red-500">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Expenses
+              </CardTitle>
+              <TrendingDown className="h-4 w-4 text-red-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold text-red-600">
+              £{totalExpenses.toFixed(2)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Fees, visa costs, and expenses
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Net Profit/Loss */}
+        <Card className={`border-l-4 ${totalIncome - totalExpenses >= 0 ? "border-l-blue-500" : "border-l-orange-500"}`}>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Net Profit
+              </CardTitle>
+              <DollarSign className={`h-4 w-4 ${totalIncome - totalExpenses >= 0 ? "text-blue-600" : "text-orange-600"}`} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className={`text-3xl font-bold ${totalIncome - totalExpenses >= 0 ? "text-blue-600" : "text-orange-600"}`}>
+              £{(totalIncome - totalExpenses).toFixed(2)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              {totalIncome - totalExpenses >= 0 ? "Overall profit" : "Overall loss"}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
