@@ -38,25 +38,44 @@ export function ApplicationFinancialSummary({
 
   return (
     <div className="space-y-6">
-      {/* Financial Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Top Balance Banner */}
+      <Card className="bg-gradient-to-r from-slate-900 to-slate-800 border-0 text-white">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-slate-300 mb-1">Net Balance</p>
+              <p className="text-4xl font-bold">{isProfit ? "+" : "-"}£{Math.abs(balance).toFixed(2)}</p>
+            </div>
+            <div className={`p-4 rounded-lg ${isProfit ? "bg-green-500/20" : "bg-red-500/20"}`}>
+              {isProfit ? (
+                <TrendingUp className="h-8 w-8 text-green-400" />
+              ) : (
+                <TrendingDown className="h-8 w-8 text-red-400" />
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Incoming Costs */}
         <Card className="border-l-4 border-l-green-500">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Incoming Costs
+              <CardTitle className="text-lg text-slate-900">
+                Incoming
               </CardTitle>
-              <TrendingUp className="h-4 w-4 text-green-600" />
+              <TrendingUp className="h-5 w-5 text-green-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-4">
               <p className="text-3xl font-bold text-green-600">
                 £{incomingTotal.toFixed(2)}
               </p>
-              <p className="text-xs text-muted-foreground">
-                Money received from applicant/company
+              <p className="text-sm text-muted-foreground">
+                Money received from applicant or company
               </p>
             </div>
           </CardContent>
@@ -66,62 +85,20 @@ export function ApplicationFinancialSummary({
         <Card className="border-l-4 border-l-red-500">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Outgoing Costs
+              <CardTitle className="text-lg text-slate-900">
+                Outgoing
               </CardTitle>
-              <TrendingDown className="h-4 w-4 text-red-600" />
+              <TrendingDown className="h-5 w-5 text-red-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-4">
               <p className="text-3xl font-bold text-red-600">
                 £{outgoingTotal.toFixed(2)}
               </p>
-              <p className="text-xs text-muted-foreground">
-                Total expenses and fees paid
+              <p className="text-sm text-muted-foreground">
+                Total expenses, fees, and costs paid
               </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Balance / Net Profit */}
-        <Card
-          className={`border-l-4 ${
-            isProfit ? "border-l-blue-500" : "border-l-orange-500"
-          }`}
-        >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Net Balance
-              </CardTitle>
-              <DollarSign
-                className={`h-4 w-4 ${
-                  isProfit ? "text-blue-600" : "text-orange-600"
-                }`}
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p
-                className={`text-3xl font-bold ${
-                  isProfit ? "text-blue-600" : "text-orange-600"
-                }`}
-              >
-                £{Math.abs(balance).toFixed(2)}
-              </p>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={isProfit ? "default" : "destructive"}
-                  className="text-xs"
-                >
-                  {isProfit ? "Profit" : "Loss"}
-                </Badge>
-                <p className="text-xs text-muted-foreground">
-                  {isProfit ? "Incoming > Outgoing" : "Outgoing > Incoming"}
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>
