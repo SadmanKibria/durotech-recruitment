@@ -46,9 +46,7 @@ export default async function AdminDashboardPage() {
     totalCVs = 0,
     newCVs = 0
   let recentApplications: any[] = []
-  let allApplications: any[] = []
-  let totalIncome = 0,
-    totalExpenses = 0
+  let payments: any[] = []
 
   try {
     const [
@@ -59,7 +57,6 @@ export default async function AdminDashboardPage() {
       cvsResult,
       newCvsResult,
       recentResult,
-      allAppsResult,
       paymentsResult,
     ] = await Promise.all([
       supabase.from("jobs").select("*", { count: "exact", head: true }),
@@ -69,7 +66,6 @@ export default async function AdminDashboardPage() {
       supabase.from("speculative_cvs").select("*", { count: "exact", head: true }),
       supabase.from("speculative_cvs").select("*", { count: "exact", head: true }).eq("status", "new"),
       supabase.from("applications").select("*, job:jobs(*)").order("created_at", { ascending: false }).limit(5),
-      supabase.from("applications").select("*, job:jobs(company_name, industry, region)"),
       supabase.from("application_payments").select("*"),
     ])
 
@@ -80,16 +76,7 @@ export default async function AdminDashboardPage() {
     totalCVs = cvsResult.count || 0
     newCVs = newCvsResult.count || 0
     recentApplications = recentResult.data || []
-    allApplications = allAppsResult.data || []
-
-    // Calculate financial totals
-    const payments = paymentsResult.data || []
-    totalIncome = payments
-      .filter((p: any) => p.payment_type === "incoming")
-      .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
-    totalExpenses = payments
-      .filter((p: any) => p.payment_type === "outgoing")
-      .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
+    payments = paymentsResult.data || []
   } catch (error) {
     console.error("Data fetch error:", error)
   }
@@ -197,11 +184,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Financial Summary */}
-      <DashboardFinancialSummary
-        payments={
-          (paymentsResult?.data as any[]) || []
-        }
-      />
+      <DashboardFinancialSummary payments={payments} />
 
       {/* Recent Applications */}
       <Card>

@@ -51,7 +51,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
     .from("application_payments")
     .select("*")
     .eq("application_id", id)
-    .order("date", { ascending: false })
+    .order("payment_date", { ascending: false })
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
