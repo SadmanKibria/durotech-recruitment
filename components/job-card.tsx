@@ -22,7 +22,7 @@ export function JobCard({ job }: JobCardProps) {
   const currencySymbol = CURRENCIES[job.currency as keyof typeof CURRENCIES]?.split(" ")[0] || job.currency
 
   return (
-    <Card className="flex flex-col h-full group hover:shadow-md hover:border-primary/20 transition-all duration-200">
+    <Card className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border-slate-200 bg-white shadow-[0_10px_35px_rgba(13,25,116,.05)] transition-all duration-300 hover:-translate-y-1 hover:border-[#ffd35a] hover:shadow-[0_22px_55px_rgba(13,25,116,.12)]">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
@@ -71,7 +71,7 @@ export function JobCard({ job }: JobCardProps) {
         <Button
           asChild
           variant="outline"
-          className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors bg-transparent"
+          className="h-11 w-full rounded-full border-[#0d1974]/15 bg-[#f4f5fb] font-bold text-[#0d1974] transition-colors group-hover:border-[#ffd35a] group-hover:bg-[#ffd35a]"
         >
           <Link href={`/jobs/${job.id}`} className="flex items-center justify-center gap-2">
             View & Apply

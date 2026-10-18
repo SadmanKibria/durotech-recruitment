@@ -1,46 +1,33 @@
-# Durotech Recruitment
+# Durotech Group
 
-The production website and staff operations portal for [Durotech Recruitment](https://www.durotech.co.uk). The public experience covers international vacancies, candidate applications, CV submissions, training and study-abroad services. The protected portal supports candidate, employer, agent, finance and workflow management.
+An independent recruitment operations platform and public website built by **Sadman Kibria** for Durotech Group.
 
-## Stack
+The project combines international job listings, candidate applications and a protected staff workspace for managing candidates, employers, agents, finance, reporting and operational activity.
 
-- Next.js 16 and React 19
-- TypeScript and Tailwind CSS 4
-- Supabase Auth and PostgreSQL
-- Vercel Blob for CV storage
-- Maileroo for transactional and staff-composed email
-- Vercel Analytics
+## Technology
 
-## Main routes
+- Next.js 16, React 19 and TypeScript
+- Tailwind CSS and accessible UI components
+- Supabase PostgreSQL and authentication
+- Netlify Next.js Runtime
+- Transactional email through a verified email provider
 
-- `/` — public marketing site
-- `/jobs` — live vacancies and filters
-- `/submit-cv` — speculative candidate submissions
-- `/admin` — public-site content and application management
-- `/portal` — protected recruitment operations portal
-- `/portal/login` — staff sign-in
+## Main areas
 
-## Local development
+- `/` — Durotech Group public website
+- `/jobs` — searchable live vacancies
+- `/portal` — integrated staff operations portal
+- `/portal/login` — protected staff access
+- `/admin` — legacy content administration during consolidation
+
+## Development
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Copy the required values into `.env.local`. Never commit credentials.
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-BLOB_READ_WRITE_TOKEN=
-MAILEROO_API_KEY=
-FROM_EMAIL=noreply@durotech.co.uk
-ADMIN_EMAIL=info@durotech.co.uk
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
-
-The integrated portal currently uses the existing protected portal backend through server-side proxy routes. Set `PORTAL_BACKEND_URL` only when using a different portal service origin.
+Create `.env.local` with the required Supabase, storage and email credentials. Never commit credentials.
 
 ## Quality checks
 
@@ -50,4 +37,6 @@ pnpm exec tsc --noEmit
 pnpm build
 ```
 
-Database changes are recorded in `scripts/`. Job creation is capped at 50 listings by a transaction-safe PostgreSQL trigger.
+## Author
+
+Designed and developed by [Sadman Kibria](https://github.com/SadmanKibria).

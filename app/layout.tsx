@@ -8,10 +8,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.durotech.co.uk"),
   title: { default: "Durotech Group | International Jobs & Study Abroad", template: "%s | Durotech Group" },
-  description: "Explore international job opportunities, submit your CV, plan your studies abroad and get practical support from Durotech Group.",
+  description: "Explore international job opportunities, plan your studies abroad and get practical support from Durotech Group.",
   keywords: ["Durotech Group", "Durotech Recruitment", "international recruitment", "overseas jobs", "work abroad", "study abroad", "global recruitment", "London recruitment"],
-  authors: [{ name: "Durotech Group" }],
-  creator: "Durotech Group",
+  authors: [{ name: "Sadman Kibria", url: "https://github.com/SadmanKibria" }],
+  creator: "Sadman Kibria",
   publisher: "Durotech Group",
   alternates: { canonical: "/" },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },

@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
       router.replace("/admin")
       router.refresh()
     } catch (err) {
-      console.error("[v0] Login error:", err)
+      console.error("Admin login error:", err)
       setError("An unexpected error occurred. Please try again.")
       setLoading(false)
     }

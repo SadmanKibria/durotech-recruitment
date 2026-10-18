@@ -5,12 +5,12 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/jobs", "/jobs/*", "/about", "/contact", "/study-abroad", "/submit-cv"],
+        allow: ["/", "/jobs", "/jobs/*", "/about", "/contact", "/study-abroad"],
         disallow: ["/admin", "/admin/*", "/api/*"],
       },
       {
         userAgent: "Googlebot",
-        allow: ["/", "/jobs", "/jobs/*", "/about", "/contact", "/study-abroad", "/submit-cv"],
+        allow: ["/", "/jobs", "/jobs/*", "/about", "/contact", "/study-abroad"],
         disallow: ["/admin", "/admin/*", "/api/*"],
       },
     ],

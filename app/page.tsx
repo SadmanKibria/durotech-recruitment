@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, BriefcaseBusiness, Check, FileText, Globe2, GraduationCap, Handshake, MapPin, ShieldCheck, Sparkles, UsersRound } from "lucide-react"
+import { ArrowRight, BriefcaseBusiness, Check, Globe2, GraduationCap, Handshake, MapPin, ShieldCheck, Sparkles, UsersRound } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { JobCard } from "@/components/job-card"
@@ -13,7 +13,7 @@ const pathways = [
 ]
 
 const steps = [
-  ["01", "Tell us your goal", "Apply for a role, submit your CV or speak to us about your hiring needs."],
+  ["01", "Tell us your goal", "Apply for a live role or speak to us about your hiring needs."],
   ["02", "Get a clear route", "We review fit, explain the process and set out the documents and next actions."],
   ["03", "Move forward supported", "Our team stays involved through selection, compliance and mobilisation."],
 ]
@@ -37,7 +37,7 @@ export default async function HomePage() {
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ffd35a]/35 bg-[#ffd35a]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[.16em] text-[#ffe48f]"><Sparkles className="size-4"/> Recruitment that moves people forward</div>
             <h1 className="max-w-3xl text-[2.7rem] font-semibold leading-[.98] tracking-[-.045em] sm:text-6xl lg:text-7xl">Your next move should feel <span className="text-[#ffd35a]">possible.</span></h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-blue-100/85 sm:text-lg">Durotech connects people, employers and education opportunities across borders—with honest guidance and human support at every step.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link href="/jobs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#ffd35a] px-6 font-bold text-[#0d1974] transition hover:bg-white">Find your opportunity <ArrowRight className="size-4"/></Link><Link href="/submit-cv" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/25 bg-white/5 px-6 font-semibold text-white transition hover:bg-white/12"><FileText className="size-4"/> Submit your CV</Link></div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link href="/jobs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#ffd35a] px-6 font-bold text-[#0d1974] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-xl">Find your opportunity <ArrowRight className="size-4"/></Link><Link href="/contact" className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/25 bg-white/5 px-6 font-semibold text-white transition hover:bg-white/12">Speak to our team</Link></div>
             <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-100/80"><span className="flex items-center gap-2"><Check className="size-4 text-[#ffd35a]"/>Real live vacancies</span><span className="flex items-center gap-2"><Check className="size-4 text-[#ffd35a]"/>End-to-end guidance</span><span className="flex items-center gap-2"><Check className="size-4 text-[#ffd35a]"/>Mobile-friendly applications</span></div>
           </div>
           <div className="relative mx-auto w-full max-w-[560px] lg:mx-0" aria-label="Durotech global opportunity network graphic">

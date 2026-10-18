@@ -139,7 +139,7 @@ const viewCopy: Record<View, [string, string]> = {
     "Job listings",
     "Publish, pause and manage every vacancy shown on the website.",
   ],
-  agents: ["Agents", "Compare agent performance, profit and commission due."],
+  agents: ["Agents", "Manage contacts, active placements and arrival outcomes."],
   employers: [
     "Employers",
     "Manage companies, placements and commercial performance.",
@@ -1230,8 +1230,8 @@ function Agents({
     <>
       <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-100 bg-blue-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-3xl text-sm text-blue-900">
-          Performance combines candidate volume, arrival outcomes, cash
-          received, placement costs and accrued commission.
+          Review each agent's contact details, active caseload and successful
+          arrival outcomes. Financial calculations stay in Finance.
         </p>
         <Input
           value={search}
@@ -1243,13 +1243,6 @@ function Agents({
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {agents.map((a) => {
           const rows = data.candidates.filter((c) => c.agentId === a.id),
-            received = rows.reduce((s, c) => s + c.incoming, 0),
-            expenses = rows.reduce((s, c) => s + c.outgoing, 0),
-            commission = rows.reduce(
-              (s, c) => s + (c.agreedAmount * a.commissionPct) / 100,
-              0,
-            ),
-            profit = received - expenses - commission,
             arrived = rows.filter((c) => c.status === "Arrived").length,
             active = rows.filter(
               (c) => !["Arrived", "Rejected"].includes(c.status),
@@ -1288,29 +1281,10 @@ function Agents({
                   {rate}% arrival rate
                 </span>
               </div>
-              <div className="mt-5 grid grid-cols-2 gap-4 border-t pt-4 text-sm">
-                <div>
-                  <b>{money(received)}</b>
-                  <p className="text-xs text-slate-500">Cash received</p>
-                </div>
-                <div>
-                  <b>{money(expenses)}</b>
-                  <p className="text-xs text-slate-500">Placement costs</p>
-                </div>
-                <div>
-                  <b
-                    className={
-                      profit < 0 ? "text-rose-600" : "text-emerald-700"
-                    }
-                  >
-                    {money(profit)}
-                  </b>
-                  <p className="text-xs text-slate-500">Net contribution</p>
-                </div>
-                <div>
-                  <b className="text-amber-700">{money(commission)}</b>
-                  <p className="text-xs text-slate-500">Commission due</p>
-                </div>
+              <div className="mt-5 grid grid-cols-3 gap-3 border-t pt-4 text-center text-sm">
+                <div><b>{rows.length}</b><p className="text-xs text-slate-500">Candidates</p></div>
+                <div><b>{active}</b><p className="text-xs text-slate-500">In progress</p></div>
+                <div><b>{arrived}</b><p className="text-xs text-slate-500">Arrived</p></div>
               </div>
               {(a.email || a.phone) && (
                 <div className="mt-4 flex flex-wrap gap-3 border-t pt-4 text-xs">
