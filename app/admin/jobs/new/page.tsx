@@ -15,15 +15,13 @@ export default async function NewJobPage() {
     redirect("/admin/login")
   }
 
-  const { count } = await supabase.from("jobs").select("id", { count: "exact", head: true })
-
   return (
     <div className="max-w-3xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Post New Job</h1>
         <p className="text-muted-foreground">Create a new job listing</p>
       </div>
-      <JobForm jobCount={count ?? 0} />
+      <JobForm />
     </div>
   )
 }

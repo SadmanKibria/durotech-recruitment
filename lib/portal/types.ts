@@ -7,5 +7,6 @@ export type Candidate = { id: number; reference: string; name: string; phone: st
 export type Transaction = { id: number; candidateId: number; candidateName: string; reference: string; direction: "incoming" | "outgoing"; category: string; amount: number; paidAt: string; note: string; createdAt: string };
 export type ActivityItem = { id: number; userEmail: string; userName: string; action: string; entityType: string; entityId: string; details: string; createdAt: string };
 export type StaffMember = { id: string; email: string; name: string; role: Role; createdAt: string };
-export type PortalData = { role: Role; currentUser: string; candidates: Candidate[]; agents: Agent[]; employers: Employer[]; transactions: Transaction[]; activity: ActivityItem[]; staff: StaffMember[] };
+export type PortalJob = { id: string; title: string; description: string; location: string; country: string; region: "europe" | "middle_east" | "asia"; industry: "construction" | "food_production" | "health" | "engineering" | "warehousing" | "garments"; employmentType: "full_time" | "part_time" | "contract" | "temporary"; salaryRange: string; currency: string; positionsAvailable: number; companyName: string; requirements: string; benefits: string; active: boolean; createdAt: string; updatedAt: string };
+export type PortalData = { role: Role; currentUser: string; candidates: Candidate[]; agents: Agent[]; employers: Employer[]; transactions: Transaction[]; activity: ActivityItem[]; staff: StaffMember[]; jobs: PortalJob[] };
 

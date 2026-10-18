@@ -7,16 +7,16 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.durotech.co.uk"),
-  title: { default: "Durotech Recruitment | International Jobs & Study Abroad", template: "%s | Durotech Recruitment" },
-  description: "Explore international job opportunities, submit your CV, plan your studies abroad and get practical support from Durotech Recruitment.",
-  keywords: ["Durotech Recruitment", "international recruitment", "overseas jobs", "work abroad", "study abroad", "global recruitment", "London recruitment"],
-  authors: [{ name: "Durotech Recruitment" }],
-  creator: "Durotech Recruitment",
-  publisher: "Durotech Recruitment",
+  title: { default: "Durotech Group | International Jobs & Study Abroad", template: "%s | Durotech Group" },
+  description: "Explore international job opportunities, submit your CV, plan your studies abroad and get practical support from Durotech Group.",
+  keywords: ["Durotech Group", "Durotech Recruitment", "international recruitment", "overseas jobs", "work abroad", "study abroad", "global recruitment", "London recruitment"],
+  authors: [{ name: "Durotech Group" }],
+  creator: "Durotech Group",
+  publisher: "Durotech Group",
   alternates: { canonical: "/" },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
-  openGraph: { type: "website", locale: "en_GB", url: "/", siteName: "Durotech Recruitment", title: "Durotech Recruitment | International Opportunities", description: "Jobs, study abroad support and responsible international recruitment—all in one place.", images: [{ url: "/professional-team-meeting-diverse-office.jpg", width: 1024, height: 1024, alt: "The Durotech recruitment team" }] },
-  twitter: { card: "summary_large_image", title: "Durotech Recruitment", description: "International opportunities with clear, human support.", images: ["/professional-team-meeting-diverse-office.jpg"] },
+  openGraph: { type: "website", locale: "en_GB", url: "/", siteName: "Durotech Group", title: "Durotech Group | International Opportunities", description: "Jobs, study abroad support and responsible international recruitment—all in one place.", images: [{ url: "/durotech-logo.png", width: 1200, height: 1200, alt: "Durotech Group" }] },
+  twitter: { card: "summary", title: "Durotech Group", description: "International opportunities with clear, human support.", images: ["/durotech-logo.png"] },
   category: "Recruitment",
 }
 
@@ -25,7 +25,7 @@ export const viewport: Viewport = { themeColor: "#0d1974", width: "device-width"
 const organisation = {
   "@context": "https://schema.org",
   "@type": "EmploymentAgency",
-  name: "Durotech Recruitment",
+  name: "Durotech Group",
   url: "https://www.durotech.co.uk",
   logo: "https://www.durotech.co.uk/durotech-logo.png",
   description: "International recruitment, training and study abroad support.",

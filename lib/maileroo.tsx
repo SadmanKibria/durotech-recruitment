@@ -31,10 +31,12 @@ export async function sendStatusUpdateEmail(applicantEmail: string, applicantNam
   )
 }
 
-export async function sendCustomEmail(to: string, subject: string, message: string) {
+export async function sendCustomEmail(to: string, subject: string, message: string, cc: string[] = []) {
   try {
     await sendEmail({
       to,
+      cc,
+      replyTo: process.env.REPLY_TO_EMAIL || "info@durotech.co.uk",
       subject,
       text: message,
       html: brandedEmail(`<div style="white-space:normal">${messageToHtml(message)}</div>`),
