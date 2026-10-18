@@ -26,10 +26,12 @@ export interface Application {
   phone: string
   right_to_work: string
   visa_required: string
+  visa_status: string | null
   citizenship_country: string | null
   accommodation_required: string
   food_required: string
   reference_agent: string | null
+  total_agreed_amount: number | null
   is_duplicate: boolean
   duplicate_application_ids: string[] | null
   resume_url: string
@@ -162,4 +164,43 @@ export const PAYMENT_CATEGORIES = {
   deposit: "Deposit",
   refund: "Refund",
   other: "Other",
+} as const
+
+export interface AdminUser {
+  id: string
+  user_id: string
+  email: string
+  name: string | null
+  role: "superadmin" | "manager" | "admin"
+  created_at: string
+  updated_at: string
+}
+
+export type AdminRole = "superadmin" | "manager" | "admin"
+
+export const ADMIN_PERMISSIONS = {
+  superadmin: {
+    canCreate: true,
+    canRead: true,
+    canUpdate: true,
+    canDelete: true,
+    canManageAdmins: true,
+    canAccessFinancials: true,
+  },
+  manager: {
+    canCreate: true,
+    canRead: true,
+    canUpdate: true,
+    canDelete: false, // Cannot delete applicants or financial data
+    canManageAdmins: false,
+    canAccessFinancials: true,
+  },
+  admin: {
+    canCreate: true,
+    canRead: true,
+    canUpdate: true, // Read and write only
+    canDelete: false,
+    canManageAdmins: false,
+    canAccessFinancials: false,
+  },
 } as const

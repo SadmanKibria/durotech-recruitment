@@ -15,7 +15,7 @@ export function Header() {
         <Link href="/" className="flex items-center gap-2.5">
           <Image src="/durotech-logo.png" alt="Durotech" width={40} height={40} className="rounded-lg" />
           <span className="text-lg font-bold text-foreground">
-            Durotech<span className="text-primary">Recruitment</span>
+            Durotech<span className="text-primary"> Recruitment</span>
           </span>
         </Link>
 
