@@ -10,7 +10,7 @@ export async function getAdminRole(): Promise<AdminRole | null> {
     } = await supabase.auth.getUser()
     if (!user) return null
 
-    const { data: adminUser } = await supabase.from("admin_users").select("role").eq("user_id", user.id).single()
+    const { data: adminUser } = await supabase.from("admin_users").select("role").eq("id", user.id).single()
 
     return adminUser?.role || null
   } catch (error) {
