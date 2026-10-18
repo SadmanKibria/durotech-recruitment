@@ -11,7 +11,7 @@
   # Next.js intentionally embeds NEXT_PUBLIC_* values in browser bundles. The
   # remaining entries are public identifiers (not credentials) that can also
   # appear in generated output and dependency metadata.
-  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SITE_URL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,SUPABASE_ANON_KEY,POSTGRES_USER"
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SITE_URL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,SUPABASE_ANON_KEY,POSTGRES_USER,POSTGRES_DATABASE"
   # Netlify's Next.js Runtime generates these folders from trusted environment
   # variables during the build. Source files remain covered by secret scanning.
   SECRETS_SCAN_OMIT_PATHS = ".next/**,.netlify/**"
