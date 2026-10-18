@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus } from "lucide-react"
+import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus, ExternalLink } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 const navItems = [
@@ -26,10 +26,12 @@ export function AdminSidebar({ user }: { user: User }) {
   }
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-card border-r flex flex-col">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-card border-r flex flex-col z-50">
       <div className="p-6 border-b">
         <Link href="/admin" className="flex items-center gap-2">
-          <Briefcase className="h-6 w-6 text-primary" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <Briefcase className="h-4 w-4 text-primary-foreground" />
+          </div>
           <span className="font-bold text-lg">Durotech Admin</span>
         </Link>
       </div>
@@ -42,7 +44,7 @@ export function AdminSidebar({ user }: { user: User }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isActive
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -59,6 +61,15 @@ export function AdminSidebar({ user }: { user: User }) {
             <Button className="w-full" size="sm">
               <Plus className="h-4 w-4 mr-2" />
               Post New Job
+            </Button>
+          </Link>
+        </div>
+
+        <div className="pt-2">
+          <Link href="/" target="_blank">
+            <Button variant="outline" className="w-full bg-transparent" size="sm">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              View Website
             </Button>
           </Link>
         </div>

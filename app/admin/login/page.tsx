@@ -58,14 +58,14 @@ export default function AdminLoginPage() {
 
       router.push("/admin")
       router.refresh()
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.")
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/30 px-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
@@ -75,7 +75,7 @@ export default function AdminLoginPage() {
           <span className="text-2xl font-bold text-foreground">Durotech</span>
         </Link>
 
-        <Card className="shadow-lg border-0 shadow-black/5">
+        <Card className="shadow-xl border-0 shadow-black/5">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-2xl">Admin Login</CardTitle>
             <CardDescription>Enter your credentials to access the dashboard</CardDescription>
