@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Menu, X, Briefcase } from "lucide-react"
+import { Menu, X, Briefcase, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Header() {
@@ -34,6 +34,12 @@ export function Header() {
             Find Jobs
           </Link>
           <Link
+            href="/submit-cv"
+            className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+          >
+            Submit CV
+          </Link>
+          <Link
             href="/about"
             className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
           >
@@ -47,7 +53,13 @@ export function Header() {
           </Link>
         </nav>
 
-        <div className="hidden md:flex">
+        <div className="hidden md:flex gap-2">
+          <Button asChild variant="outline" className="bg-transparent">
+            <Link href="/submit-cv">
+              <FileText className="mr-2 h-4 w-4" />
+              Submit CV
+            </Link>
+          </Button>
           <Button asChild>
             <Link href="/jobs">
               <Briefcase className="mr-2 h-4 w-4" />
@@ -68,7 +80,7 @@ export function Header() {
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="border-t md:hidden animate-in slide-in-from-top-2 duration-200">
+        <div className="border-t md:hidden">
           <nav className="flex flex-col p-4 bg-background">
             <Link
               href="/"
@@ -85,6 +97,13 @@ export function Header() {
               Find Jobs
             </Link>
             <Link
+              href="/submit-cv"
+              className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Submit CV
+            </Link>
+            <Link
               href="/about"
               className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
               onClick={() => setIsMenuOpen(false)}
@@ -98,7 +117,13 @@ export function Header() {
             >
               Contact
             </Link>
-            <div className="pt-3 mt-3 border-t">
+            <div className="pt-3 mt-3 border-t space-y-2">
+              <Button asChild variant="outline" className="w-full bg-transparent">
+                <Link href="/submit-cv" onClick={() => setIsMenuOpen(false)}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Submit CV
+                </Link>
+              </Button>
               <Button asChild className="w-full">
                 <Link href="/jobs" onClick={() => setIsMenuOpen(false)}>
                   <Briefcase className="mr-2 h-4 w-4" />

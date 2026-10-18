@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Globe, Users, Building2, Award, Briefcase, ChevronRight } from "lucide-react"
+import { ArrowRight, Globe, Users, Building2, Award, Briefcase, ChevronRight, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Header } from "@/components/header"
@@ -48,14 +48,6 @@ export default async function HomePage() {
     },
   ]
 
-  const industryIcons: Record<string, string> = {
-    construction: "hard-hat",
-    food_production: "utensils",
-    health: "heart-pulse",
-    engineering: "cog",
-    warehousing: "warehouse",
-  }
-
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -88,9 +80,9 @@ export default async function HomePage() {
                   variant="outline"
                   className="h-12 px-6 border-slate-600 text-white hover:bg-slate-800 bg-transparent"
                 >
-                  <Link href="/about">
-                    Learn More
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                  <Link href="/submit-cv">
+                    <FileText className="mr-2 h-5 w-5" />
+                    Submit Your CV
                   </Link>
                 </Button>
               </div>
@@ -216,6 +208,33 @@ export default async function HomePage() {
                 </Link>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Submit CV CTA Section */}
+        <section className="py-16 md:py-20 bg-background">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-0 overflow-hidden">
+              <CardContent className="p-8 md:p-12">
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="flex-1 text-center md:text-left">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white">Don't See the Right Role?</h2>
+                    <p className="mt-4 text-slate-300 max-w-xl">
+                      Submit your CV to our talent pool and we'll match you with suitable positions as they become
+                      available. Be the first to know about new opportunities.
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <Button asChild size="lg" className="h-12 px-8">
+                      <Link href="/submit-cv">
+                        <FileText className="mr-2 h-5 w-5" />
+                        Submit Your CV
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
