@@ -37,7 +37,7 @@ export function EmailCandidateButton({ candidate, iconOnly = false }: { candidat
       </Button>
     </DialogTrigger>
     <DialogContent className="sm:max-w-xl">
-      <DialogHeader><DialogTitle>Email {candidate.name}</DialogTitle><DialogDescription>The message will be sent to {candidate.email} and recorded in the activity log.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>Email {candidate.name}</DialogTitle><DialogDescription>The message will be sent securely to {candidate.email} through Durotech&apos;s mail service.</DialogDescription></DialogHeader>
       <div className="space-y-4 py-2"><div className="space-y-2"><Label htmlFor={`subject-${candidate.id}`}>Subject</Label><Input id={`subject-${candidate.id}`} value={subject} onChange={event => setSubject(event.target.value)} maxLength={160}/></div><div className="space-y-2"><Label htmlFor={`message-${candidate.id}`}>Message</Label><Textarea id={`message-${candidate.id}`} value={message} onChange={event => setMessage(event.target.value)} rows={9} maxLength={10000}/></div></div>
       <DialogFooter><Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button><Button onClick={send} disabled={sending || !subject.trim() || !message.trim()} className="bg-[#0d1974] hover:bg-[#17258d]">{sending ? "Sending…" : "Send email"}</Button></DialogFooter>
     </DialogContent>
