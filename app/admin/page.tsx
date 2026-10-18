@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Briefcase, Users, CheckCircle, Clock, ArrowRight, Inbox, TrendingUp } from "lucide-react"
+import { Briefcase, Users, CheckCircle, Clock, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { APPLICATION_STATUSES } from "@/lib/types"
@@ -42,9 +42,7 @@ export default async function AdminDashboardPage() {
   let totalJobs = 0,
     activeJobs = 0,
     totalApplications = 0,
-    newApplications = 0,
-    totalCVs = 0,
-    newCVs = 0
+    newApplications = 0
   let recentApplications: any[] = []
   let payments: any[] = []
 
@@ -54,8 +52,6 @@ export default async function AdminDashboardPage() {
       activeJobsResult,
       applicationsResult,
       newAppsResult,
-      cvsResult,
-      newCvsResult,
       recentResult,
       paymentsResult,
     ] = await Promise.all([
@@ -63,8 +59,6 @@ export default async function AdminDashboardPage() {
       supabase.from("jobs").select("*", { count: "exact", head: true }).eq("is_active", true),
       supabase.from("applications").select("*", { count: "exact", head: true }),
       supabase.from("applications").select("*", { count: "exact", head: true }).eq("status", "applied"),
-      supabase.from("speculative_cvs").select("*", { count: "exact", head: true }),
-      supabase.from("speculative_cvs").select("*", { count: "exact", head: true }).eq("status", "new"),
       supabase.from("applications").select("*, job:jobs(*)").order("created_at", { ascending: false }).limit(5),
       supabase.from("application_payments").select("*"),
     ])
@@ -73,8 +67,6 @@ export default async function AdminDashboardPage() {
     activeJobs = activeJobsResult.count || 0
     totalApplications = applicationsResult.count || 0
     newApplications = newAppsResult.count || 0
-    totalCVs = cvsResult.count || 0
-    newCVs = newCvsResult.count || 0
     recentApplications = recentResult.data || []
     payments = paymentsResult.data || []
   } catch (error) {
@@ -113,21 +105,6 @@ export default async function AdminDashboardPage() {
       color: "text-amber-600 bg-amber-100",
       highlight: (newApplications || 0) > 0,
     },
-    {
-      title: "Talent Pool",
-      value: totalCVs || 0,
-      icon: Inbox,
-      href: "/admin/talent-pool",
-      color: "text-cyan-600 bg-cyan-100",
-    },
-    {
-      title: "New CVs",
-      value: newCVs || 0,
-      icon: TrendingUp,
-      href: "/admin/talent-pool",
-      color: "text-pink-600 bg-pink-100",
-      highlight: (newCVs || 0) > 0,
-    },
   ]
 
   const getStatusBadge = (status: string) => {
@@ -161,7 +138,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
           <Link key={stat.title} href={stat.href}>
             <Card

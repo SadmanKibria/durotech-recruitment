@@ -56,7 +56,7 @@ export default function CookiePolicyPage() {
 
               <h3 className="text-xl font-semibold mt-6 mb-3">Analytics Cookies</h3>
               <p className="text-muted-foreground mb-4">
-                We use analytics tools (such as Vercel Analytics) to understand how visitors interact with our website.
+                We may use privacy-conscious analytics to understand how visitors interact with our website.
                 These cookies help us measure and improve the content and user experience of our site.
               </p>
 

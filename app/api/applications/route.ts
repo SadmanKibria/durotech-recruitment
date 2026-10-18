@@ -1,7 +1,7 @@
-import { put } from "@vercel/blob"
 import { type NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendApplicationConfirmation, sendAdminNotification } from "@/lib/maileroo"
+import { uploadResume } from "@/lib/resume-storage"
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,19 +29,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File size must be less than 5MB" }, { status: 400 })
     }
 
-    let resumeUrl = ""
-    let resumeFilename = ""
-
-    try {
-      const blob = await put(`resumes/${Date.now()}-${resume.name}`, resume, { access: "public" })
-      resumeUrl = blob.url
-      resumeFilename = resume.name
-    } catch (uploadError) {
-      console.error("Blob upload error:", uploadError)
-      return NextResponse.json({ error: "Failed to upload resume" }, { status: 500 })
+    const allowedTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ]
+    if (!allowedTypes.includes(resume.type)) {
+      return NextResponse.json({ error: "Please upload a PDF or Word document" }, { status: 400 })
     }
 
     const supabase = createAdminClient()
+    let resumeUrl = ""
+    const resumeFilename = resume.name
+
+    try {
+      resumeUrl = await uploadResume(supabase, resume)
+    } catch (uploadError) {
+      console.error("CV upload error:", uploadError)
+      return NextResponse.json({ error: "Failed to upload resume" }, { status: 500 })
+    }
 
     const { data: existingApplications } = await supabase
       .from("applications")

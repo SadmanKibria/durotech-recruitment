@@ -187,109 +187,6 @@ export function Portal({ userName }: { userName: string }) {
     const timer = window.setTimeout(() => void refresh(), 0);
     return () => window.clearTimeout(timer);
   }, [refresh]);
-  useEffect(() => {
-    const context = (
-      document as Document & {
-        modelContext?: {
-          registerTool: (tool: unknown) => unknown;
-        };
-      }
-    ).modelContext;
-    if (!context?.registerTool) return;
-    const run = async (input: unknown) => {
-      const response = await fetch("/api/portal/data", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(input),
-      });
-      const result = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(result.error);
-      await refresh();
-      return { success: true };
-    };
-    try {
-      context.registerTool(
-        {
-          name: "create_candidate",
-          title: "Create candidate",
-          description:
-            "Create a candidate placement record in the Durotech portal.",
-          inputSchema: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              phone: { type: "string" },
-              nationality: { type: "string" },
-              destinationCountry: { type: "string" },
-              jobTitle: { type: "string" },
-              agreedAmount: { type: "number" },
-            },
-            required: [
-              "name",
-              "nationality",
-              "destinationCountry",
-              "jobTitle",
-              "agreedAmount",
-            ],
-            additionalProperties: false,
-          },
-          annotations: { readOnlyHint: false, untrustedContentHint: false },
-          execute: (input: Record<string, unknown>) =>
-            run({ action: "save_candidate", status: "Applied", ...input }),
-        },
-      );
-      context.registerTool(
-        {
-          name: "update_candidate_status",
-          title: "Update candidate status",
-          description:
-            "Move an existing candidate to one of Durotech's application stages.",
-          inputSchema: {
-            type: "object",
-            properties: {
-              id: { type: "integer" },
-              status: { type: "string", enum: APPLICATION_STATUSES },
-            },
-            required: ["id", "status"],
-            additionalProperties: false,
-          },
-          annotations: { readOnlyHint: false, untrustedContentHint: false },
-          execute: (input: Record<string, unknown>) =>
-            run({ action: "update_status", ...input }),
-        },
-      );
-      context.registerTool(
-        {
-          name: "record_candidate_transaction",
-          title: "Record candidate transaction",
-          description:
-            "Record an incoming candidate payment or outgoing placement expense in GBP.",
-          inputSchema: {
-            type: "object",
-            properties: {
-              candidateId: { type: "integer" },
-              direction: { type: "string", enum: ["incoming", "outgoing"] },
-              category: { type: "string" },
-              amount: { type: "number" },
-              paidAt: { type: "string" },
-              note: { type: "string" },
-            },
-            required: [
-              "candidateId",
-              "direction",
-              "category",
-              "amount",
-              "paidAt",
-            ],
-            additionalProperties: false,
-          },
-          annotations: { readOnlyHint: false, untrustedContentHint: false },
-          execute: (input: Record<string, unknown>) =>
-            run({ action: "add_transaction", ...input }),
-        },
-      );
-    } catch {}
-  }, [refresh]);
   const searched = useMemo(() => {
     const q = query.trim().toLowerCase();
     return data.candidates.filter((c) =>
@@ -331,13 +228,13 @@ export function Portal({ userName }: { userName: string }) {
         className={`fixed inset-y-0 left-0 z-40 flex w-[264px] flex-col bg-[#091b3a] text-white shadow-2xl transition-transform lg:translate-x-0 ${mobile ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex h-[82px] items-center gap-3 border-b border-white/10 px-5">
-          <div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[#ffd35a] p-1.5">
+          <div className="grid size-12 shrink-0 place-items-center overflow-hidden">
             <Image
               src="/durotech-logo.png"
               alt="Durotech Group"
               width={48}
               height={48}
-              className="h-full w-full object-contain"
+              className="h-full w-full scale-[1.12] object-cover"
             />
           </div>
           <div>

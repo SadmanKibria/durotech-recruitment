@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
@@ -36,5 +35,5 @@ const organisation = {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><head><link rel="icon" href="/durotech-logo.png"/><link rel="apple-touch-icon" href="/durotech-logo.png"/><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}/></head><body className={`${inter.variable} font-sans antialiased`}>{children}<Analytics/></body></html>
+  return <html lang="en"><head><link rel="icon" href="/durotech-logo.png"/><link rel="apple-touch-icon" href="/durotech-logo.png"/><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}/></head><body className={`${inter.variable} font-sans antialiased`}>{children}</body></html>
 }

@@ -190,7 +190,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
               </div>
             </div>
             <div className="pt-4 space-y-2">
-              <a href={application.resume_url} target="_blank" rel="noopener noreferrer" className="block">
+              <a href={`/api/applications/${application.id}/resume`} target="_blank" rel="noopener noreferrer" className="block">
                 <Button className="w-full">
                   <Download className="h-4 w-4 mr-2" />
                   Download Resume

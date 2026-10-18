@@ -106,7 +106,7 @@ export default async function AdminApplicationsPage({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                    <a href={app.resume_url} target="_blank" rel="noopener noreferrer" download>
+                    <a href={`/api/applications/${app.id}/resume`} target="_blank" rel="noopener noreferrer">
                       <Button variant="outline" size="sm">
                         <Download className="h-4 w-4 sm:mr-2" />
                         <span className="hidden sm:inline">Resume</span>

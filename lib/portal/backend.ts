@@ -1,25 +1,27 @@
-import { cookies } from "next/headers"
+import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 
-const PORTAL_ORIGIN = process.env.PORTAL_BACKEND_URL || "https://durotech-recruitment-portal.vercel.app"
+export type PortalRole = "admin" | "secretary"
 
-export async function portalBackendFetch(path: string, init: RequestInit = {}) {
-  const cookieStore = await cookies()
-  const cookieHeader = cookieStore.getAll().map(({ name, value }) => `${name}=${value}`).join("; ")
-  const headers = new Headers(init.headers)
-  if (cookieHeader) headers.set("cookie", cookieHeader)
-  headers.set("accept", "application/json")
-  return fetch(`${PORTAL_ORIGIN}${path}`, { ...init, headers, cache: "no-store", redirect: "manual" })
+export type PortalSession = {
+  id: string
+  email: string
+  currentUser: string
+  role: PortalRole
 }
 
-export async function getPortalSession() {
-  const response = await portalBackendFetch("/api/data")
-  if (!response.ok) return null
-  return response.json() as Promise<{ currentUser: string; role: "admin" | "secretary" }>
-}
+export async function getPortalSession(): Promise<PortalSession | null> {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getUser()
+  const email = data.user?.email?.toLowerCase()
+  if (!data.user || !email) return null
 
-export function copyPortalCookies(source: Response, target: Response) {
-  const getSetCookie = (source.headers as Headers & { getSetCookie?: () => string[] }).getSetCookie
-  const cookies = getSetCookie ? getSetCookie.call(source.headers) : source.headers.get("set-cookie") ? [source.headers.get("set-cookie")!] : []
-  cookies.forEach(value => target.headers.append("set-cookie", value))
-  return target
+  const { data: staff } = await createAdminClient()
+    .from("portal_staff")
+    .select("id,email,name,role")
+    .eq("email", email)
+    .maybeSingle()
+
+  if (!staff) return null
+  return { id: staff.id, email: staff.email, currentUser: staff.name, role: staff.role as PortalRole }
 }

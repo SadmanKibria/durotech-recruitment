@@ -1,8 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { put } from "@vercel/blob"
+import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
+import { uploadResume } from "@/lib/resume-storage"
 
 export async function POST(request: NextRequest) {
   try {
+    const sessionClient = await createClient()
+    const { data: auth } = await sessionClient.auth.getUser()
+    if (!auth.user) {
+      return NextResponse.json({ error: "Unauthorised" }, { status: 401 })
+    }
+
     const formData = await request.formData()
     const file = formData.get("file") as File
 
@@ -27,13 +35,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File size must be less than 10MB" }, { status: 400 })
     }
 
-    const blob = await put(file.name, file, {
-      access: "public",
-      addRandomSuffix: true,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-    })
+    const url = await uploadResume(createAdminClient(), file)
 
-    return NextResponse.json({ url: blob.url, filename: file.name })
+    return NextResponse.json({ url, filename: file.name })
   } catch (error) {
     console.error("[UPLOAD_ERROR]", error)
     return NextResponse.json(
