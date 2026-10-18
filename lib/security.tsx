@@ -50,19 +50,25 @@ export function checkRateLimit(key: string, maxAttempts: number, windowMs: numbe
 
     const { attempts, windowStart } = JSON.parse(data)
 
+    // Reset window if time has elapsed
     if (now - windowStart > windowMs) {
-      // Reset window
       localStorage.setItem(storageKey, JSON.stringify({ attempts: 1, windowStart: now }))
       return true
     }
 
+    // If max attempts reached, still check if window has passed
     if (attempts >= maxAttempts) {
+      if (now - windowStart > windowMs) {
+        localStorage.setItem(storageKey, JSON.stringify({ attempts: 1, windowStart: now }))
+        return true
+      }
       return false
     }
 
     localStorage.setItem(storageKey, JSON.stringify({ attempts: attempts + 1, windowStart }))
     return true
   } catch {
+    // On error, allow submission
     return true
   }
 }

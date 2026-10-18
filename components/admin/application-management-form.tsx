@@ -92,6 +92,14 @@ export function ApplicationManagementForm({ application }: { application: Applic
 
       if (paymentError) throw paymentError
 
+      // Add to activity log
+      await supabase.from("application_notes").insert({
+        application_id: application.id,
+        note_type: "payment",
+        content: `${paymentType === "incoming" ? "Received" : "Paid"} ${paymentCurrency} ${paymentAmount} - ${paymentCategory}: ${paymentDescription}`,
+        created_by: "Admin",
+      })
+
       // Reset payment form
       setPaymentCategory("")
       setPaymentAmount("")
@@ -124,28 +132,40 @@ export function ApplicationManagementForm({ application }: { application: Applic
     setError(null)
 
     try {
-      const fileExt = cvFile.name.split(".").pop()
-      const fileName = `${application.id}-${Date.now()}.${fileExt}`
-      const filePath = `resumes/${fileName}`
+      const formData = new FormData()
+      formData.append("file", cvFile)
 
-      const { error: uploadError } = await supabase.storage.from("resumes").upload(filePath, cvFile)
+      const uploadResponse = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      })
 
-      if (uploadError) throw uploadError
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json()
+        throw new Error(errorData.error || "Failed to upload file")
+      }
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("resumes").getPublicUrl(filePath)
+      const { url: resumeUrl } = await uploadResponse.json()
 
+      // Update application with new CV
       const { error: updateError } = await supabase
         .from("applications")
         .update({
-          resume_url: publicUrl,
+          resume_url: resumeUrl,
           resume_filename: cvFile.name,
           updated_at: new Date().toISOString(),
         })
         .eq("id", application.id)
 
       if (updateError) throw updateError
+
+      // Add note to activity log
+      await supabase.from("application_notes").insert({
+        application_id: application.id,
+        note_type: "document",
+        content: `CV/Resume updated: ${cvFile.name}`,
+        created_by: "Admin",
+      })
 
       setCvFile(null)
       if (fileInputRef.current) fileInputRef.current.value = ""
@@ -155,6 +175,7 @@ export function ApplicationManagementForm({ application }: { application: Applic
 
       setTimeout(() => setSuccess(false), 3000)
     } catch (err) {
+      console.error("[CV_UPLOAD_ERROR]", err)
       setError(err instanceof Error ? err.message : "Failed to upload CV")
     } finally {
       setUploadProgress(false)
@@ -249,6 +270,7 @@ export function ApplicationManagementForm({ application }: { application: Applic
             </Button>
           </div>
           {cvFile && <p className="text-xs text-muted-foreground">Selected: {cvFile.name}</p>}
+          <p className="text-xs text-muted-foreground">Accepted: PDF, DOC, DOCX (max 10MB)</p>
         </CardContent>
       </Card>
 

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus, ExternalLink, Inbox } from "lucide-react"
+import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus, ExternalLink, Inbox, Building2 } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 const navItems = [
@@ -13,7 +13,7 @@ const navItems = [
   { href: "/admin/jobs", label: "Jobs", icon: FileText },
   { href: "/admin/applications", label: "Applications", icon: Users },
   { href: "/admin/talent-pool", label: "Talent Pool", icon: Inbox },
-  { href: "/admin/companies", label: "Companies", icon: Briefcase },
+  { href: "/admin/companies", label: "Companies", icon: Building2 },
 ]
 
 export function AdminSidebar({ user }: { user: User }) {
@@ -30,15 +30,18 @@ export function AdminSidebar({ user }: { user: User }) {
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-card border-r flex flex-col z-50">
       <div className="p-6 border-b">
-        <Link href="/admin" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Briefcase className="h-4 w-4 text-primary-foreground" />
+        <Link href="/admin" className="flex items-center gap-3">
+          <div className="relative h-10 w-10 rounded-lg overflow-hidden bg-primary flex items-center justify-center">
+            <Briefcase className="h-6 w-6 text-primary-foreground" />
           </div>
-          <span className="font-bold text-lg">Durotech Admin</span>
+          <div>
+            <span className="font-bold text-lg block leading-tight">Durotech</span>
+            <span className="text-xs text-muted-foreground">Admin Portal</span>
+          </div>
         </Link>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href))
           return (
@@ -52,22 +55,20 @@ export function AdminSidebar({ user }: { user: User }) {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
-              <item.icon className="h-5 w-5" />
+              <item.icon className="h-5 w-5 shrink-0" />
               {item.label}
             </Link>
           )
         })}
 
-        <div className="pt-4">
+        <div className="pt-4 space-y-2">
           <Link href="/admin/jobs/new">
             <Button className="w-full" size="sm">
               <Plus className="h-4 w-4 mr-2" />
               Post New Job
             </Button>
           </Link>
-        </div>
 
-        <div className="pt-2">
           <Link href="/" target="_blank">
             <Button variant="outline" className="w-full bg-transparent" size="sm">
               <ExternalLink className="h-4 w-4 mr-2" />
@@ -78,7 +79,10 @@ export function AdminSidebar({ user }: { user: User }) {
       </nav>
 
       <div className="p-4 border-t">
-        <p className="text-xs text-muted-foreground mb-2 truncate">{user.email}</p>
+        <div className="mb-3 p-2 bg-muted/50 rounded-lg">
+          <p className="text-xs font-medium text-muted-foreground mb-0.5">Signed in as</p>
+          <p className="text-xs truncate font-medium">{user.email}</p>
+        </div>
         <Button variant="outline" size="sm" className="w-full bg-transparent" onClick={handleLogout}>
           <LogOut className="h-4 w-4 mr-2" />
           Sign Out

@@ -27,15 +27,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File size must be less than 10MB" }, { status: 400 })
     }
 
-    // Upload to Vercel Blob
     const blob = await put(file.name, file, {
       access: "public",
       addRandomSuffix: true,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     })
 
-    return NextResponse.json({ url: blob.url })
+    return NextResponse.json({ url: blob.url, filename: file.name })
   } catch (error) {
     console.error("[UPLOAD_ERROR]", error)
-    return NextResponse.json({ error: "Failed to upload file" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : "Failed to upload file",
+      },
+      { status: 500 },
+    )
   }
 }
