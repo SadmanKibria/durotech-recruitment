@@ -23,6 +23,7 @@ import { APPLICATION_STATUSES, INDUSTRIES, REGIONS } from "@/lib/types"
 import { ApplicationNotes } from "@/components/admin/application-notes"
 import { EmailApplicantButton } from "@/components/admin/email-applicant-button"
 import { ApplicationManagementForm } from "@/components/admin/application-management-form"
+import { ApplicationFinancialSummary } from "@/components/admin/application-financial-summary"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -44,6 +45,13 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
   const { data: application } = await supabase.from("applications").select("*, job:jobs(*), agent:agents(*)").eq("id", id).single()
 
   if (!application) notFound()
+
+  // Fetch payment records for this application
+  const { data: payments } = await supabase
+    .from("application_payments")
+    .select("*")
+    .eq("application_id", id)
+    .order("date", { ascending: false })
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -250,6 +258,19 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
           </CardContent>
         </Card>
       )}
+
+      {/* Financial Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Financial Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ApplicationFinancialSummary 
+            application={application} 
+            payments={payments || []}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
