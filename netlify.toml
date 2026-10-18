@@ -10,20 +10,9 @@
   NEXT_TELEMETRY_DISABLED = "1"
 
 [[redirects]]
-  from = "https://www.durotech.co.uk/*"
-  to = "https://durotech.co.uk/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/404"
-  status = 404
 
 [[headers]]
   for = "/*"
