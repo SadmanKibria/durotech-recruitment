@@ -13,6 +13,7 @@ import { Loader2, Plus, Save, DollarSign, FileText, Upload, Check, AlertCircle }
 import { APPLICATION_STATUSES } from "@/lib/types"
 import type { Application } from "@/lib/types"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { sendStatusUpdateEmail } from "@/lib/maileroo"
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
@@ -48,6 +49,9 @@ export function ApplicationManagementForm({ application }: { application: Applic
     setSuccess(false)
 
     try {
+      // Check if status changed
+      const statusChanged = status !== application.status
+
       const { error: updateError } = await supabase
         .from("applications")
         .update({
@@ -60,6 +64,19 @@ export function ApplicationManagementForm({ application }: { application: Applic
         .eq("id", application.id)
 
       if (updateError) throw updateError
+
+      // Send email notification if status changed
+      if (statusChanged) {
+        await sendStatusUpdateEmail(
+          application.email,
+          application.name,
+          application.job?.title || "Position",
+          status
+        ).catch((err) => {
+          console.error("Failed to send status update email:", err)
+          // Don't fail the status update if email fails
+        })
+      }
 
       setSuccess(true)
       router.refresh()

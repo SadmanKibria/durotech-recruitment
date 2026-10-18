@@ -11,14 +11,14 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2.5">
               <Image src="/durotech-logo.png" alt="Durotech" width={40} height={40} className="rounded-lg" />
               <span className="text-lg font-bold">
-                Durotech<span className="text-[#F5C547]">Limited</span>
+                Durotech<span className="text-[#F5C547]">Group</span>
               </span>
             </Link>
             <p className="mt-4 text-sm text-slate-300 leading-relaxed">
               Connecting talented professionals with leading employers across Europe, the Middle East and Asia. We also
               help students achieve their dreams of studying abroad.
             </p>
-            <p className="mt-2 text-xs text-slate-400">Trading as Durotech Recruitment</p>
+            <p className="mt-2 text-xs text-slate-400">Worldwide employment opportunities for global talent</p>
           </div>
 
           {/* Quick Links */}
@@ -110,7 +110,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2 text-sm text-slate-300">
                 <Phone className="h-4 w-4 flex-shrink-0 text-[#F5C547]" />
-                <span>+44 20 1234 5678</span>
+                <span>+44 7950 206007</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-slate-300">
                 <MapPin className="h-4 w-4 flex-shrink-0 text-[#F5C547]" />
@@ -142,9 +142,10 @@ export function Footer() {
 
         <div className="mt-8 border-t border-slate-700 pt-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-slate-400">
-              &copy; {new Date().getFullYear()} Durotech Limited Trading as Durotech Recruitment. All rights reserved.
-            </p>
+            <div className="text-sm text-slate-400 text-center sm:text-left">
+              <p>&copy; {new Date().getFullYear()} Durotech Group. All rights reserved.</p>
+              <p className="text-xs text-slate-500 mt-2">Worldwide presence: UK • Bangladesh • Serbia</p>
+            </div>
             <div className="flex items-center gap-4">
               <Link
                 href="/admin/login"
@@ -166,6 +167,38 @@ export function Footer() {
                 </a>
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Social Media Links */}
+        <div className="mt-8 border-t border-slate-700 pt-8">
+          <div className="flex items-center justify-center gap-6">
+            <a
+              href="https://www.facebook.com/profile.php?id=61565862601426"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-[#F5C547] transition-colors text-sm font-medium"
+            >
+              Facebook
+            </a>
+            <span className="text-slate-600">•</span>
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-[#F5C547] transition-colors text-sm font-medium"
+            >
+              Instagram
+            </a>
+            <span className="text-slate-600">•</span>
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-[#F5C547] transition-colors text-sm font-medium"
+            >
+              X (Twitter)
+            </a>
           </div>
         </div>
       </div>
