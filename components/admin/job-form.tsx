@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -13,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
-import { REGIONS, INDUSTRIES, EMPLOYMENT_TYPES } from "@/lib/types"
+import { REGIONS, INDUSTRIES, EMPLOYMENT_TYPES, CURRENCIES } from "@/lib/types"
 import type { Job } from "@/lib/types"
 
 interface JobFormProps {
@@ -36,6 +35,9 @@ export function JobForm({ job }: JobFormProps) {
     industry: job?.industry || "",
     employment_type: job?.employment_type || "",
     salary_range: job?.salary_range || "",
+    currency: job?.currency || "GBP",
+    positions_available: job?.positions_available || 1,
+    company_name: job?.company_name || "",
     requirements: job?.requirements || "",
     benefits: job?.benefits || "",
     is_active: job?.is_active ?? true,
@@ -46,14 +48,10 @@ export function JobForm({ job }: JobFormProps) {
     setLoading(true)
     setError(null)
 
-    const data = {
-      ...formData,
-      updated_at: new Date().toISOString(),
-    }
+    const data = { ...formData, updated_at: new Date().toISOString() }
 
     if (isEditing) {
       const { error } = await supabase.from("jobs").update(data).eq("id", job.id)
-
       if (error) {
         setError(error.message)
         setLoading(false)
@@ -61,7 +59,6 @@ export function JobForm({ job }: JobFormProps) {
       }
     } else {
       const { error } = await supabase.from("jobs").insert(data)
-
       if (error) {
         setError(error.message)
         setLoading(false)
@@ -73,7 +70,7 @@ export function JobForm({ job }: JobFormProps) {
     router.refresh()
   }
 
-  const handleChange = (field: string, value: string | boolean) => {
+  const handleChange = (field: string, value: string | boolean | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -98,6 +95,17 @@ export function JobForm({ job }: JobFormProps) {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="company_name">Company Name *</Label>
+            <Input
+              id="company_name"
+              value={formData.company_name}
+              onChange={(e) => handleChange("company_name", e.target.value)}
+              placeholder="e.g., ABC Construction Ltd"
+              required
+            />
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="region">Region *</Label>
@@ -114,7 +122,6 @@ export function JobForm({ job }: JobFormProps) {
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="industry">Industry *</Label>
               <Select value={formData.industry} onValueChange={(value) => handleChange("industry", value)} required>
@@ -143,7 +150,6 @@ export function JobForm({ job }: JobFormProps) {
                 required
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="location">City/Location *</Label>
               <Input
@@ -156,7 +162,7 @@ export function JobForm({ job }: JobFormProps) {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="employment_type">Employment Type *</Label>
               <Select
@@ -176,16 +182,43 @@ export function JobForm({ job }: JobFormProps) {
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="salary_range">Salary Range</Label>
+              <Label htmlFor="positions_available">Positions Available *</Label>
               <Input
-                id="salary_range"
-                value={formData.salary_range}
-                onChange={(e) => handleChange("salary_range", e.target.value)}
-                placeholder="e.g., $50,000 - $70,000"
+                id="positions_available"
+                type="number"
+                min="1"
+                value={formData.positions_available}
+                onChange={(e) => handleChange("positions_available", Number.parseInt(e.target.value) || 1)}
+                required
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="currency">Currency</Label>
+              <Select value={formData.currency} onValueChange={(value) => handleChange("currency", value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(CURRENCIES).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="salary_range">Monthly Salary Range</Label>
+            <Input
+              id="salary_range"
+              value={formData.salary_range}
+              onChange={(e) => handleChange("salary_range", e.target.value)}
+              placeholder="e.g., 2,000 - 3,000"
+            />
+            <p className="text-xs text-muted-foreground">Enter the monthly salary range (currency selected above)</p>
           </div>
 
           <div className="space-y-2">
@@ -194,7 +227,7 @@ export function JobForm({ job }: JobFormProps) {
               id="description"
               value={formData.description}
               onChange={(e) => handleChange("description", e.target.value)}
-              placeholder="Describe the role and responsibilities..."
+              placeholder="Describe the role..."
               rows={6}
               required
             />
@@ -206,7 +239,7 @@ export function JobForm({ job }: JobFormProps) {
               id="requirements"
               value={formData.requirements}
               onChange={(e) => handleChange("requirements", e.target.value)}
-              placeholder="List the required qualifications and experience..."
+              placeholder="List qualifications..."
               rows={4}
             />
           </div>
@@ -217,7 +250,7 @@ export function JobForm({ job }: JobFormProps) {
               id="benefits"
               value={formData.benefits}
               onChange={(e) => handleChange("benefits", e.target.value)}
-              placeholder="List the benefits and perks..."
+              placeholder="List benefits..."
               rows={4}
             />
           </div>

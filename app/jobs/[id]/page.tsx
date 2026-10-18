@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, MapPin, DollarSign, Calendar, CheckCircle, Clock } from "lucide-react"
+import { ArrowLeft, MapPin, DollarSign, CheckCircle, Clock, Users, Building } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { createClient } from "@/lib/supabase/server"
-import { type Job, REGIONS, INDUSTRIES, EMPLOYMENT_TYPES } from "@/lib/types"
+import { type Job, REGIONS, INDUSTRIES, EMPLOYMENT_TYPES, CURRENCIES } from "@/lib/types"
 import { ApplicationForm } from "@/components/application-form"
 
 interface JobDetailPageProps {
@@ -17,14 +17,12 @@ interface JobDetailPageProps {
 export default async function JobDetailPage({ params }: JobDetailPageProps) {
   const { id } = await params
   const supabase = await createClient()
-
   const { data: job } = await supabase.from("jobs").select("*").eq("id", id).eq("is_active", true).single()
 
-  if (!job) {
-    notFound()
-  }
+  if (!job) notFound()
 
   const jobData = job as Job
+  const currencySymbol = CURRENCIES[jobData.currency as keyof typeof CURRENCIES]?.split(" ")[0] || jobData.currency
 
   const industryColors: Record<string, string> = {
     construction: "bg-amber-100 text-amber-800 border-amber-200",
@@ -32,9 +30,10 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
     health: "bg-red-100 text-red-800 border-red-200",
     engineering: "bg-blue-100 text-blue-800 border-blue-200",
     warehousing: "bg-purple-100 text-purple-800 border-purple-200",
+    garments: "bg-pink-100 text-pink-800 border-pink-200",
   }
 
-  const parseRequirements = (text: string | null) => {
+  const parseList = (text: string | null) => {
     if (!text) return []
     return text
       .split(/[.\n]/)
@@ -42,20 +41,10 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
       .filter((item) => item.length > 0)
   }
 
-  const parseBenefits = (text: string | null) => {
-    if (!text) return []
-    return text
-      .split(/[,\n]/)
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0)
-  }
-
   return (
     <div className="flex min-h-screen flex-col bg-secondary/30">
       <Header />
-
       <main className="flex-1">
-        {/* Back Link */}
         <div className="bg-background border-b">
           <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
             <Link
@@ -75,9 +64,21 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
               <Badge className={`${industryColors[jobData.industry]} border`}>{INDUSTRIES[jobData.industry]}</Badge>
               <Badge variant="outline">{EMPLOYMENT_TYPES[jobData.employment_type]}</Badge>
               <Badge variant="outline">{REGIONS[jobData.region]}</Badge>
+              {jobData.positions_available > 1 && (
+                <Badge variant="secondary" className="bg-primary/10 text-primary">
+                  <Users className="h-3 w-3 mr-1" />
+                  {jobData.positions_available} positions
+                </Badge>
+              )}
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">{jobData.title}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{jobData.title}</h1>
+            {jobData.company_name && (
+              <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                <Building className="h-4 w-4" />
+                <span className="font-medium">{jobData.company_name}</span>
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
@@ -89,23 +90,14 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
               {jobData.salary_range && (
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
-                  <span>{jobData.salary_range}</span>
+                  <span>
+                    {currencySymbol} {jobData.salary_range}/month
+                  </span>
                 </div>
               )}
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 <span>{EMPLOYMENT_TYPES[jobData.employment_type]}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>
-                  Posted{" "}
-                  {new Date(jobData.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </span>
               </div>
             </div>
           </div>
@@ -113,7 +105,6 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
           <div className="grid gap-6 lg:grid-cols-5">
             {/* Main Content */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Description */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">About this role</CardTitle>
@@ -123,7 +114,6 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
                 </CardContent>
               </Card>
 
-              {/* Requirements */}
               {jobData.requirements && (
                 <Card>
                   <CardHeader>
@@ -131,8 +121,8 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3">
-                      {parseRequirements(jobData.requirements).map((req, index) => (
-                        <li key={index} className="flex items-start gap-3 text-muted-foreground">
+                      {parseList(jobData.requirements).map((req, i) => (
+                        <li key={i} className="flex items-start gap-3 text-muted-foreground">
                           <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                           <span>{req}</span>
                         </li>
@@ -142,7 +132,6 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
                 </Card>
               )}
 
-              {/* Benefits */}
               {jobData.benefits && (
                 <Card>
                   <CardHeader>
@@ -150,8 +139,8 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3">
-                      {parseBenefits(jobData.benefits).map((benefit, index) => (
-                        <li key={index} className="flex items-start gap-3 text-muted-foreground">
+                      {parseList(jobData.benefits).map((benefit, i) => (
+                        <li key={i} className="flex items-start gap-3 text-muted-foreground">
                           <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                           <span>{benefit}</span>
                         </li>
@@ -178,7 +167,6 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   )

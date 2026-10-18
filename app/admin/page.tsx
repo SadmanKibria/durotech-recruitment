@@ -2,9 +2,10 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Briefcase, Users, CheckCircle, Clock, ArrowRight, Inbox, TrendingUp } from "lucide-react"
+import { Briefcase, Users, CheckCircle, Clock, ArrowRight, Inbox, TrendingUp, Building2 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { APPLICATION_STATUSES } from "@/lib/types"
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
@@ -26,7 +27,7 @@ export default async function AdminDashboardPage() {
   const { count: newApplications } = await supabase
     .from("applications")
     .select("*", { count: "exact", head: true })
-    .eq("status", "new")
+    .eq("status", "applied")
 
   const { count: totalCVs } = await supabase.from("speculative_cvs").select("*", { count: "exact", head: true })
   const { count: newCVs } = await supabase
@@ -41,11 +42,16 @@ export default async function AdminDashboardPage() {
     .order("created_at", { ascending: false })
     .limit(5)
 
-  const { data: recentCVs } = await supabase
-    .from("speculative_cvs")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(3)
+  const { data: companyStats } = await supabase
+    .from("applications")
+    .select("job:jobs(company_name)")
+    .eq("status", "arrived")
+
+  const companyBreakdown: Record<string, number> = {}
+  companyStats?.forEach((app) => {
+    const company = app.job?.company_name || "Unassigned"
+    companyBreakdown[company] = (companyBreakdown[company] || 0) + 1
+  })
 
   const stats = [
     {
@@ -63,7 +69,7 @@ export default async function AdminDashboardPage() {
       color: "text-emerald-600 bg-emerald-100",
     },
     {
-      title: "Total Applications",
+      title: "Applications",
       value: totalApplications || 0,
       icon: Users,
       href: "/admin/applications",
@@ -73,7 +79,7 @@ export default async function AdminDashboardPage() {
       title: "New Applications",
       value: newApplications || 0,
       icon: Clock,
-      href: "/admin/applications?status=new",
+      href: "/admin/applications?status=applied",
       color: "text-amber-600 bg-amber-100",
       highlight: (newApplications || 0) > 0,
     },
@@ -96,13 +102,14 @@ export default async function AdminDashboardPage() {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      new: "bg-blue-50 text-blue-700 border-blue-200",
-      reviewed: "bg-amber-50 text-amber-700 border-amber-200",
-      shortlisted: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      applied: "bg-blue-50 text-blue-700 border-blue-200",
+      offer_issued: "bg-amber-50 text-amber-700 border-amber-200",
+      visa_applied: "bg-purple-50 text-purple-700 border-purple-200",
+      visa_approved: "bg-green-50 text-green-700 border-green-200",
+      at_embassy: "bg-cyan-50 text-cyan-700 border-cyan-200",
+      visa_stamped: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      arrived: "bg-green-100 text-green-800 border-green-300",
       rejected: "bg-red-50 text-red-700 border-red-200",
-      hired: "bg-purple-50 text-purple-700 border-purple-200",
-      contacted: "bg-green-50 text-green-700 border-green-200",
-      archived: "bg-slate-50 text-slate-700 border-slate-200",
     }
     return styles[status] || "bg-slate-50 text-slate-700 border-slate-200"
   }
@@ -170,7 +177,7 @@ export default async function AdminDashboardPage() {
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-medium truncate text-sm">{app.name}</p>
                       <Badge variant="outline" className={`${getStatusBadge(app.status)} text-xs`}>
-                        {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                        {APPLICATION_STATUSES[app.status as keyof typeof APPLICATION_STATUSES] || app.status}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground truncate">{app.job?.title || "Unknown Job"}</p>
@@ -189,51 +196,35 @@ export default async function AdminDashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <CardTitle className="text-lg">Recent Talent Pool CVs</CardTitle>
-            <Link href="/admin/talent-pool">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                View all
-                <ArrowRight className="ml-1 h-4 w-4" />
-              </Button>
-            </Link>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              Workers by Company
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {recentCVs && recentCVs.length > 0 ? (
+            {Object.keys(companyBreakdown).length > 0 ? (
               <div className="space-y-3">
-                {recentCVs.map((cv) => (
-                  <Link
-                    key={cv.id}
-                    href={`/admin/talent-pool/${cv.id}`}
-                    className="flex flex-col p-3 border rounded-lg hover:bg-muted/50 transition-colors gap-2"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium truncate text-sm">{cv.name}</p>
-                      <Badge variant="outline" className={`${getStatusBadge(cv.status)} text-xs`}>
-                        {cv.status.charAt(0).toUpperCase() + cv.status.slice(1)}
+                {Object.entries(companyBreakdown)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([company, count]) => (
+                    <div key={company} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <Building2 className="h-4 w-4 text-primary" />
+                        </div>
+                        <span className="font-medium text-sm">{company}</span>
+                      </div>
+                      <Badge variant="secondary" className="text-sm">
+                        {count} worker{count !== 1 ? "s" : ""} arrived
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">{cv.email}</p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      {cv.preferred_industry && (
-                        <Badge variant="secondary" className="text-xs">
-                          {cv.preferred_industry.replace("_", " ")}
-                        </Badge>
-                      )}
-                      {cv.preferred_region && (
-                        <Badge variant="secondary" className="text-xs">
-                          {cv.preferred_region.replace("_", " ")}
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">{new Date(cv.created_at).toLocaleDateString()}</p>
-                  </Link>
-                ))}
+                  ))}
               </div>
             ) : (
               <div className="py-8 text-center">
-                <Inbox className="mx-auto h-10 w-10 text-muted-foreground/50" />
-                <p className="mt-2 text-sm text-muted-foreground">No CVs submitted yet</p>
-                <p className="text-xs text-muted-foreground">Speculative CVs will appear here</p>
+                <Building2 className="mx-auto h-10 w-10 text-muted-foreground/50" />
+                <p className="mt-2 text-sm text-muted-foreground">No workers arrived yet</p>
+                <p className="text-xs text-muted-foreground">Workers with "Arrived" status will appear here</p>
               </div>
             )}
           </CardContent>

@@ -4,48 +4,43 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Mail, Phone, Download, Eye, Calendar } from "lucide-react"
+import { Mail, Phone, Download, Eye, Calendar, AlertTriangle } from "lucide-react"
 import { APPLICATION_STATUSES } from "@/lib/types"
 import { NoApplications } from "@/components/empty-states"
+import { SearchBar } from "@/components/admin/search-bar"
 
 export default async function AdminApplicationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>
+  searchParams: Promise<{ status?: string; search?: string }>
 }) {
-  const { status: statusFilter } = await searchParams
+  const { status: statusFilter, search } = await searchParams
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect("/admin/login")
-  }
+  if (!user) redirect("/admin/login")
 
   let query = supabase.from("applications").select("*, job:jobs(*)").order("created_at", { ascending: false })
 
-  if (statusFilter) {
-    query = query.eq("status", statusFilter)
-  }
+  if (statusFilter) query = query.eq("status", statusFilter)
+  if (search) query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`)
 
   const { data: applications } = await query
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "new":
-        return "bg-blue-50 text-blue-700 border-blue-200"
-      case "reviewed":
-        return "bg-amber-50 text-amber-700 border-amber-200"
-      case "shortlisted":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200"
-      case "rejected":
-        return "bg-red-50 text-red-700 border-red-200"
-      case "hired":
-        return "bg-purple-50 text-purple-700 border-purple-200"
-      default:
-        return "bg-slate-50 text-slate-700 border-slate-200"
+    const colors: Record<string, string> = {
+      applied: "bg-blue-50 text-blue-700 border-blue-200",
+      offer_issued: "bg-amber-50 text-amber-700 border-amber-200",
+      visa_applied: "bg-purple-50 text-purple-700 border-purple-200",
+      visa_approved: "bg-green-50 text-green-700 border-green-200",
+      at_embassy: "bg-cyan-50 text-cyan-700 border-cyan-200",
+      visa_stamped: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      arrived: "bg-green-100 text-green-800 border-green-300",
+      rejected: "bg-red-50 text-red-700 border-red-200",
     }
+    return colors[status] || "bg-slate-50 text-slate-700 border-slate-200"
   }
 
   return (
@@ -54,6 +49,8 @@ export default async function AdminApplicationsPage({
         <h1 className="text-2xl font-bold">Applications</h1>
         <p className="text-muted-foreground text-sm">Review and manage job applications</p>
       </div>
+
+      <SearchBar placeholder="Search by name, email, or phone..." baseUrl="/admin/applications" />
 
       <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
         <Link href="/admin/applications">
@@ -80,8 +77,14 @@ export default async function AdminApplicationsPage({
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-semibold text-lg">{app.name}</h3>
                       <Badge variant="outline" className={getStatusColor(app.status)}>
-                        {APPLICATION_STATUSES[app.status as keyof typeof APPLICATION_STATUSES]}
+                        {APPLICATION_STATUSES[app.status as keyof typeof APPLICATION_STATUSES] || app.status}
                       </Badge>
+                      {app.is_duplicate && (
+                        <Badge variant="destructive" className="gap-1">
+                          <AlertTriangle className="h-3 w-3" />
+                          Duplicate
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm font-medium text-primary">Applied for: {app.job?.title || "Unknown Job"}</p>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
@@ -118,7 +121,7 @@ export default async function AdminApplicationsPage({
             </Card>
           ))
         ) : (
-          <NoApplications filtered={!!statusFilter} />
+          <NoApplications filtered={!!statusFilter || !!search} />
         )}
       </div>
     </div>

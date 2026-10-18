@@ -19,6 +19,7 @@ export function Footer() {
             <p className="mt-4 text-sm text-slate-400 leading-relaxed">
               Connecting talented professionals with leading employers across Europe, the Middle East, and Asia.
             </p>
+            <p className="mt-2 text-xs text-slate-500">Trading as Durotech Recruitment</p>
           </div>
 
           {/* Quick Links */}
@@ -28,6 +29,11 @@ export function Footer() {
               <li>
                 <Link href="/jobs" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Find Jobs
+                </Link>
+              </li>
+              <li>
+                <Link href="/submit-cv" className="text-sm text-slate-400 hover:text-white transition-colors">
+                  Submit CV
                 </Link>
               </li>
               <li>
@@ -69,6 +75,14 @@ export function Footer() {
                   className="text-sm text-slate-400 hover:text-white transition-colors"
                 >
                   Engineering
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/jobs?industry=garments"
+                  className="text-sm text-slate-400 hover:text-white transition-colors"
+                >
+                  Garments
                 </Link>
               </li>
               <li>
@@ -125,7 +139,7 @@ export function Footer() {
         <div className="mt-8 border-t border-slate-800 pt-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-500">
-              &copy; {new Date().getFullYear()} Durotech Recruitment. All rights reserved.
+              &copy; {new Date().getFullYear()} Durotech Limited. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <Link
