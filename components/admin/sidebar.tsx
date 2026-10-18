@@ -13,6 +13,7 @@ const navItems = [
   { href: "/admin/jobs", label: "Jobs", icon: FileText },
   { href: "/admin/applications", label: "Applications", icon: Users },
   { href: "/admin/talent-pool", label: "Talent Pool", icon: Inbox },
+  { href: "/admin/companies", label: "Companies", icon: Briefcase },
 ]
 
 export function AdminSidebar({ user }: { user: User }) {
