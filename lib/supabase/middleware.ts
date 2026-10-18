@@ -29,10 +29,18 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Only protect admin routes
-  if (request.nextUrl.pathname.startsWith("/admin") && !user) {
+  const isAdminLogin = request.nextUrl.pathname === "/admin/login"
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin")
+
+  if (isAdminRoute && !isAdminLogin && !user) {
     const url = request.nextUrl.clone()
-    url.pathname = "/auth/login"
+    url.pathname = "/admin/login"
+    return NextResponse.redirect(url)
+  }
+
+  if (isAdminLogin && user) {
+    const url = request.nextUrl.clone()
+    url.pathname = "/admin"
     return NextResponse.redirect(url)
   }
 
