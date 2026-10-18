@@ -16,7 +16,7 @@ export function EmailCandidateButton({ candidate, iconOnly = false }: { candidat
   const [to, setTo] = useState(candidate.email)
   const [cc, setCc] = useState("")
   const [subject, setSubject] = useState(`Durotech application update — ${candidate.status}`)
-  const [message, setMessage] = useState(`Hello ${candidate.name},\n\nYour application for ${candidate.jobTitle} in ${candidate.destinationCountry} is now: ${candidate.status}.\n\nIf you have any questions, please reply to this email.\n\nDurotech Recruitment`)
+  const [message, setMessage] = useState(`Hello ${candidate.name},\n\nYour application for ${candidate.jobTitle} in ${candidate.destinationCountry} is now: ${candidate.status}.\n\nIf you have any questions, please reply to this email.\n\nDurotech Group`)
 
   async function send() {
     setSending(true)
