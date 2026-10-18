@@ -100,12 +100,14 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
     <div className="flex min-h-screen flex-col">
       <Header />
 
-      <main className="flex-1 bg-secondary/30">
+      <main className="flex-1 bg-[#f7f8fc]">
         {/* Hero */}
-        <section className="bg-slate-900 py-12 sm:py-16">
+        <section className="relative overflow-hidden bg-[#0d1974] py-14 text-white sm:py-20">
+          <div className="absolute -right-24 -top-32 size-96 rounded-full border-[54px] border-white/5" />
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">Find Your Perfect Job</h1>
-            <p className="mt-2 text-slate-400">Browse opportunities across Europe, Middle East, and Asia</p>
+            <p className="text-xs font-bold uppercase tracking-[.2em] text-[#ffd35a]">Live opportunities</p>
+            <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-.04em] sm:text-6xl">Find work that moves you forward.</h1>
+            <p className="mt-5 max-w-xl text-lg leading-8 text-blue-100/75">Clear vacancy details, simple applications and a real team to guide you through the process.</p>
           </div>
         </section>
 
@@ -113,7 +115,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
         <JobFilters currentRegion={params.region} currentIndustry={params.industry} currentType={params.type} />
 
         {/* Jobs List */}
-        <section className="py-8 sm:py-12">
+        <section className="py-10 sm:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {await JobsList({ searchParams })}
           </div>

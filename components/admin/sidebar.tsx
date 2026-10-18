@@ -5,14 +5,13 @@ import { usePathname, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus, ExternalLink, Inbox, Building2, UserCog } from "lucide-react"
+import { Briefcase, LayoutDashboard, FileText, Users, LogOut, Plus, ExternalLink, Building2, UserCog } from "lucide-react"
 import type { User } from "@supabase/supabase-js"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/jobs", label: "Jobs", icon: FileText },
   { href: "/admin/applications", label: "Applications", icon: Users },
-  { href: "/admin/talent-pool", label: "Talent Pool", icon: Inbox },
   { href: "/admin/companies", label: "Companies", icon: Building2 },
   { href: "/admin/agents", label: "Agents", icon: UserCog },
 ]

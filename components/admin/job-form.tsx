@@ -17,7 +17,6 @@ import type { Job } from "@/lib/types"
 
 interface JobFormProps {
   job?: Job
-  jobCount?: number
 }
 
 function capitalizeWords(str: string): string {
@@ -31,7 +30,7 @@ function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-export function JobForm({ job, jobCount = 0 }: JobFormProps) {
+export function JobForm({ job }: JobFormProps) {
   const router = useRouter()
   const supabase = createClient()
   const isEditing = !!job
@@ -157,7 +156,6 @@ export function JobForm({ job, jobCount = 0 }: JobFormProps) {
     <Card>
       <CardHeader>
         <CardTitle>{isEditing ? "Edit Job" : "Create New Job"}</CardTitle>
-        {!isEditing && <p className="text-sm text-muted-foreground">{jobCount} of 50 job listings used</p>}
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -351,7 +349,7 @@ export function JobForm({ job, jobCount = 0 }: JobFormProps) {
           </div>
 
           <div className="flex gap-4 pt-4">
-            <Button type="submit" disabled={loading || success || (!isEditing && jobCount >= 50)}>
+            <Button type="submit" disabled={loading || success}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

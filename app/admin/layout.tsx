@@ -18,7 +18,7 @@ export default async function AdminLayout({
     const { data } = await supabase.auth.getUser()
     user = data?.user
   } catch (error) {
-    console.error("[v0] Admin layout auth error:", error)
+    console.error("Admin layout auth error:", error)
   }
 
   return (

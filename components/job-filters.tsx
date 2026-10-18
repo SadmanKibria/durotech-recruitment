@@ -29,9 +29,9 @@ export function JobFilters({ currentRegion, currentIndustry, currentType }: JobF
   const hasFilters = currentRegion || currentIndustry || currentType
 
   return (
-    <section className="border-b bg-background py-4 sm:py-6">
+    <section className="border-b border-slate-200 bg-white py-5 sm:py-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-[#fafbff] p-4 shadow-sm sm:flex-row sm:items-center">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Filter className="h-4 w-4" />
             <span className="text-sm font-medium">Filter by:</span>
