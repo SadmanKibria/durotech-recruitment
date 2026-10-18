@@ -47,24 +47,24 @@ export default function ContactPage() {
   const offices = [
     {
       city: "London (HQ)",
-      region: "Europe",
-      address: "123 Recruitment Street, London, EC1A 1BB, United Kingdom",
-      phone: "+44 20 1234 5678",
-      email: "london@durotechrecruitment.com",
+      region: "United Kingdom",
+      address: "London, United Kingdom",
+      phone: "+44 7950 206007",
+      email: "info@durotech.co.uk",
     },
     {
-      city: "Dubai",
-      region: "Middle East",
-      address: "Business Bay Tower, Floor 15, Dubai, UAE",
-      phone: "+971 4 123 4567",
-      email: "dubai@durotechrecruitment.com",
+      city: "Dhaka",
+      region: "Bangladesh",
+      address: "Dhaka, Bangladesh",
+      phone: "+44 7950 206007",
+      email: "info@durotech.co.uk",
     },
     {
-      city: "Singapore",
-      region: "Asia",
-      address: "Marina Bay Financial Centre, Singapore 018983",
-      phone: "+65 6123 4567",
-      email: "singapore@durotechrecruitment.com",
+      city: "Belgrade",
+      region: "Serbia",
+      address: "Belgrade, Serbia",
+      phone: "+44 7950 206007",
+      email: "info@durotech.co.uk",
     },
   ]
 
@@ -286,7 +286,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Phone</p>
-                        <p className="font-medium">+44 20 1234 5678</p>
+                        <p className="font-medium">+44 7950 206007</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">

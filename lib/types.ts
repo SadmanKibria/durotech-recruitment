@@ -32,6 +32,9 @@ export interface Application {
   food_required: string
   reference_agent: string | null
   total_agreed_amount: number | null
+  arrival_date: string | null
+  assigned_company: string | null
+  status_changed_at: string | null
   is_duplicate: boolean
   duplicate_application_ids: string[] | null
   resume_url: string
@@ -80,6 +83,19 @@ export interface Company {
   contact_email: string | null
   contact_phone: string | null
   address: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Agent {
+  id: string
+  name: string
+  email: string | null
+  phone: string | null
+  company: string | null
+  commission_rate: number
+  is_active: boolean
   notes: string | null
   created_at: string
   updated_at: string

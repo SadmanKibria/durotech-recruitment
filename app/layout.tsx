@@ -131,7 +131,7 @@ export default function RootLayout({
               url: "https://durotech.co.uk",
               logo: "https://durotech.co.uk/durotech-logo.png",
               image: "https://durotech.co.uk/og-image.jpg",
-              telephone: "+44-20-1234-5678",
+              telephone: "+44-7950-206007",
               email: "info@durotech.co.uk",
               address: {
                 "@type": "PostalAddress",
@@ -147,7 +147,7 @@ export default function RootLayout({
               },
               contactPoint: {
                 "@type": "ContactPoint",
-                telephone: "+44-20-1234-5678",
+                telephone: "+44-7950-206007",
                 contactType: "customer service",
                 email: "info@durotech.co.uk",
                 availableLanguage: ["English", "Arabic", "Bengali", "Polish", "Romanian"],

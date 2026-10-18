@@ -30,6 +30,8 @@ export function ApplicationManagementForm({ application }: { application: Applic
   const [visaStatus, setVisaStatus] = useState(application.visa_status || "")
   const [referenceAgent, setReferenceAgent] = useState(application.reference_agent || "")
   const [totalAgreedAmount, setTotalAgreedAmount] = useState(application.total_agreed_amount?.toString() || "")
+  const [arrivalDate, setArrivalDate] = useState(application.arrival_date || "")
+  const [assignedCompany, setAssignedCompany] = useState(application.assigned_company || "")
 
   // Payment form
   const [paymentType, setPaymentType] = useState("incoming")
@@ -59,6 +61,8 @@ export function ApplicationManagementForm({ application }: { application: Applic
           visa_status: visaStatus || null,
           reference_agent: referenceAgent || null,
           total_agreed_amount: totalAgreedAmount ? Number.parseFloat(totalAgreedAmount) : null,
+          arrival_date: arrivalDate || null,
+          assigned_company: assignedCompany || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", application.id)
@@ -218,7 +222,7 @@ export function ApplicationManagementForm({ application }: { application: Applic
       )}
 
       {/* Status & Core Fields */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="status">Application Status</Label>
           <Select value={status} onValueChange={setStatus}>
@@ -246,15 +250,32 @@ export function ApplicationManagementForm({ application }: { application: Applic
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="referenceAgent">
-            <DollarSign className="h-3 w-3 inline mr-1" />
-            Reference / Agent
-          </Label>
+          <Label htmlFor="referenceAgent">Reference / Agent</Label>
           <Input
             id="referenceAgent"
             value={referenceAgent}
             onChange={(e) => setReferenceAgent(e.target.value)}
             placeholder="e.g., Global Recruitment"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="assignedCompany">Assigned Company</Label>
+          <Input
+            id="assignedCompany"
+            value={assignedCompany}
+            onChange={(e) => setAssignedCompany(e.target.value)}
+            placeholder="e.g., ABC Construction Ltd"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="arrivalDate">Arrival Date</Label>
+          <Input
+            id="arrivalDate"
+            type="date"
+            value={arrivalDate}
+            onChange={(e) => setArrivalDate(e.target.value)}
           />
         </div>
 

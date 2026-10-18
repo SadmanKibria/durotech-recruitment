@@ -14,14 +14,14 @@
 Ensure all environment variables are set in your deployment platform:
 
 ### Supabase
-```
+\`\`\`
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
+\`\`\`
 
 ### Database (Postgres)
-```
+\`\`\`
 POSTGRES_URL=your_postgres_url
 POSTGRES_PRISMA_URL=your_prisma_url
 POSTGRES_URL_NON_POOLING=your_non_pooling_url
@@ -29,24 +29,24 @@ POSTGRES_USER=your_user
 POSTGRES_PASSWORD=your_password
 POSTGRES_DATABASE=your_database
 POSTGRES_HOST=your_host
-```
+\`\`\`
 
 ### Storage
-```
+\`\`\`
 BLOB_READ_WRITE_TOKEN=your_vercel_blob_token
-```
+\`\`\`
 
 ### Email
-```
+\`\`\`
 MAILEROO_API_KEY=your_maileroo_key
 FROM_EMAIL=noreply@durotech.co.uk
 ADMIN_EMAIL=admin@durotech.co.uk
-```
+\`\`\`
 
 ### Site Configuration
-```
+\`\`\`
 NEXT_PUBLIC_SITE_URL=https://durotech.co.uk
-```
+\`\`\`
 
 ## Database Setup
 
@@ -56,17 +56,17 @@ The main schema should already be set up in your Supabase instance.
 ### Step 2: Add Admin Roles and Fields
 Run the SQL script in `scripts/add-admin-roles-and-fields.sql` in your Supabase SQL editor:
 
-```sql
+\`\`\`sql
 -- This will add:
 -- 1. visa_status field to applications table
 -- 2. total_agreed_amount field to applications table
 -- 3. admin_users table for role-based access control
-```
+\`\`\`
 
 ### Step 3: Create Admin Users
 After running the script, create admin users in Supabase Auth, then add them to the admin_users table:
 
-```sql
+\`\`\`sql
 -- Insert admin users (replace with actual user IDs from auth.users)
 INSERT INTO admin_users (email, name, role, user_id)
 VALUES 
@@ -74,7 +74,7 @@ VALUES
   ('manager@durotech.com', 'Manager Name', 'manager', 'user-uuid-here'),
   ('admin@durotech.com', 'Admin Name', 'admin', 'user-uuid-here')
 ON CONFLICT (email) DO NOTHING;
-```
+\`\`\`
 
 ## Admin Roles & Permissions
 
@@ -142,10 +142,10 @@ ON CONFLICT (email) DO NOTHING;
 ## Admin Access
 
 ### Default Admin Account
-```
+\`\`\`
 Email: admin@durotech.com
 Password: DurotechAdmin2024!
-```
+\`\`\`
 
 **⚠️ IMPORTANT:** Change the default password immediately after first login!
 

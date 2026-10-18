@@ -61,9 +61,20 @@ export function ApplicationNotes({ application }: { application: Application }) 
   const [noteType, setNoteType] = useState("general")
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
-  const [adminName, setAdminName] = useState("")
+  const [adminEmail, setAdminEmail] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+
+  // Auto-detect admin user
+  useEffect(() => {
+    async function getAdminUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        setAdminEmail(user.email)
+      }
+    }
+    getAdminUser()
+  }, [])
 
   const noteTypes = [
     {
@@ -134,21 +145,24 @@ export function ApplicationNotes({ application }: { application: Application }) 
 
   useEffect(() => {
     fetchActivities()
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchActivities()
+    }, 30000)
+    
+    return () => clearInterval(interval)
   }, [application.id])
 
   const handleAddNote = async () => {
     if (!newNote.trim()) return
-    if (!adminName.trim()) {
-      alert("Please enter your name before adding a note")
-      return
-    }
 
     setLoading(true)
     const { error } = await supabase.from("application_notes").insert({
       application_id: application.id,
       note_type: noteType,
       content: newNote.trim(),
-      created_by: adminName.trim(),
+      created_by: adminEmail || "Admin",
     })
 
     if (!error) {
@@ -195,39 +209,25 @@ export function ApplicationNotes({ application }: { application: Application }) 
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="adminName">
-                Your Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="adminName"
-                value={adminName}
-                onChange={(e) => setAdminName(e.target.value)}
-                placeholder="Enter your name"
-                className="bg-background"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="noteType">Note Type</Label>
-              <Select value={noteType} onValueChange={setNoteType}>
-                <SelectTrigger className="bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {noteTypes
-                    .filter((t) => t.value !== "payment")
-                    .map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        <span className="flex items-center gap-2">
-                          <type.icon className="h-4 w-4" />
-                          {type.label}
-                        </span>
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="noteType">Note Type</Label>
+            <Select value={noteType} onValueChange={setNoteType}>
+              <SelectTrigger className="bg-background max-w-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {noteTypes
+                  .filter((t) => t.value !== "payment")
+                  .map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      <span className="flex items-center gap-2">
+                        <type.icon className="h-4 w-4" />
+                        {type.label}
+                      </span>
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -246,7 +246,7 @@ export function ApplicationNotes({ application }: { application: Application }) 
 
           <Button
             onClick={handleAddNote}
-            disabled={loading || !newNote.trim() || !adminName.trim()}
+            disabled={loading || !newNote.trim()}
             className="w-full sm:w-auto"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}

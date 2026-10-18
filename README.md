@@ -30,7 +30,7 @@ International recruitment agency website by **Sadman Kibria**, connecting talent
 
 Required environment variables (set in Vercel/Netlify dashboard or `.env.local`):
 
-```env
+\`\`\`env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -55,27 +55,27 @@ ADMIN_EMAIL=admin@durotech.co.uk
 
 # Site Configuration
 NEXT_PUBLIC_SITE_URL=https://durotech.co.uk
-```
+\`\`\`
 
 ## 🛠️ Local Development
 
 1. Clone the repository:
-```bash
+\`\`\`bash
 git clone <your-repo-url>
 cd durotech-recruitment
-```
+\`\`\`
 
 2. Install dependencies:
-```bash
+\`\`\`bash
 npm install
-```
+\`\`\`
 
 3. Create `.env.local` and add your environment variables
 
 4. Run the development server:
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 5. Open [http://localhost:3000](http://localhost:3000)
 
@@ -119,10 +119,10 @@ See `DEPLOYMENT.md` for detailed setup instructions.
 - Limited financial access
 
 ### Default Admin Account
-```
+\`\`\`
 Email: admin@durotech.co.uk
 Password: DurotechAdmin2024!
-```
+\`\`\`
 
 **⚠️ IMPORTANT:** Change the default password immediately after first login!
 
