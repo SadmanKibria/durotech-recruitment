@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { MapPin, Building2, Clock, DollarSign } from "lucide-react"
+import { MapPin, Clock, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -11,54 +11,59 @@ interface JobCardProps {
 
 export function JobCard({ job }: JobCardProps) {
   const industryColors: Record<string, string> = {
-    construction: "bg-amber-100 text-amber-800",
-    food_production: "bg-green-100 text-green-800",
-    health: "bg-red-100 text-red-800",
-    engineering: "bg-blue-100 text-blue-800",
-    warehousing: "bg-purple-100 text-purple-800",
+    construction: "bg-amber-50 text-amber-700 border-amber-200",
+    food_production: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    health: "bg-rose-50 text-rose-700 border-rose-200",
+    engineering: "bg-blue-50 text-blue-700 border-blue-200",
+    warehousing: "bg-violet-50 text-violet-700 border-violet-200",
   }
 
   return (
-    <Card className="flex flex-col transition-shadow hover:shadow-lg">
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <h3 className="font-semibold text-lg text-foreground line-clamp-2">{job.title}</h3>
-            <p className="text-sm text-muted mt-1">{job.country}</p>
+    <Card className="flex flex-col h-full group hover:shadow-md hover:border-primary/20 transition-all duration-200">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-base text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+              {job.title}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1">{job.country}</p>
           </div>
-          <Badge className={industryColors[job.industry] || "bg-secondary text-secondary-foreground"}>
+          <Badge
+            variant="outline"
+            className={`${industryColors[job.industry] || "bg-secondary"} text-xs flex-shrink-0`}
+          >
             {INDUSTRIES[job.industry]}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 pb-2">
-        <div className="space-y-2 text-sm text-muted">
+
+      <CardContent className="flex-1 pb-3">
+        <div className="space-y-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 flex-shrink-0" />
-            <span>
+            <MapPin className="h-4 w-4 flex-shrink-0 text-muted-foreground/70" />
+            <span className="truncate">
               {job.location}, {REGIONS[job.region]}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 flex-shrink-0" />
-            <span>{INDUSTRIES[job.industry]}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 flex-shrink-0" />
+            <Clock className="h-4 w-4 flex-shrink-0 text-muted-foreground/70" />
             <span>{EMPLOYMENT_TYPES[job.employment_type]}</span>
           </div>
-          {job.salary_range && (
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 flex-shrink-0" />
-              <span>{job.salary_range}</span>
-            </div>
-          )}
+          {job.salary_range && <p className="font-medium text-foreground pt-1">{job.salary_range}</p>}
         </div>
-        <p className="mt-3 text-sm text-muted line-clamp-2">{job.description}</p>
+        <p className="mt-3 text-sm text-muted-foreground line-clamp-2 leading-relaxed">{job.description}</p>
       </CardContent>
-      <CardFooter className="pt-2">
-        <Button asChild className="w-full bg-[#0066cc] hover:bg-[#0052a3] text-white">
-          <Link href={`/jobs/${job.id}`}>View Details</Link>
+
+      <CardFooter className="pt-0">
+        <Button
+          asChild
+          variant="outline"
+          className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors bg-transparent"
+        >
+          <Link href={`/jobs/${job.id}`} className="flex items-center justify-center gap-2">
+            View & Apply
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </Button>
       </CardFooter>
     </Card>

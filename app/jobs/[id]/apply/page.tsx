@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Header } from "@/components/header"
@@ -15,6 +15,8 @@ interface ApplyPageProps {
 
 export default async function ApplyPage({ params }: ApplyPageProps) {
   const { id } = await params
+  redirect(`/jobs/${id}`)
+
   const supabase = await createClient()
 
   const { data: job } = await supabase.from("jobs").select("*").eq("id", id).eq("is_active", true).single()

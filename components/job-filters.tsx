@@ -1,8 +1,10 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { REGIONS, INDUSTRIES, EMPLOYMENT_TYPES } from "@/lib/types"
 import { Button } from "@/components/ui/button"
-import { Filter } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Filter, X } from "lucide-react"
 import Link from "next/link"
 
 interface JobFiltersProps {
@@ -12,73 +14,82 @@ interface JobFiltersProps {
 }
 
 export function JobFilters({ currentRegion, currentIndustry, currentType }: JobFiltersProps) {
+  const router = useRouter()
+
   const handleFilterChange = (key: string, value: string) => {
     const url = new URL(window.location.href)
-    if (value) {
+    if (value && value !== "all") {
       url.searchParams.set(key, value)
     } else {
       url.searchParams.delete(key)
     }
-    window.location.href = url.toString()
+    router.push(url.pathname + url.search)
   }
 
+  const hasFilters = currentRegion || currentIndustry || currentType
+
   return (
-    <section className="border-b border-border py-6 bg-secondary">
+    <section className="border-b bg-background py-4 sm:py-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <form className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-muted" />
-            <span className="text-sm font-medium">Filters:</span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Filter className="h-4 w-4" />
+            <span className="text-sm font-medium">Filter by:</span>
           </div>
 
-          <select
-            name="region"
-            defaultValue={currentRegion || ""}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-            onChange={(e) => handleFilterChange("region", e.target.value)}
-          >
-            <option value="">All Regions</option>
-            {Object.entries(REGIONS).map(([key, name]) => (
-              <option key={key} value={key}>
-                {name}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={currentRegion || "all"} onValueChange={(value) => handleFilterChange("region", value)}>
+              <SelectTrigger className="w-[140px] sm:w-[160px] h-9">
+                <SelectValue placeholder="Region" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Regions</SelectItem>
+                {Object.entries(REGIONS).map(([key, name]) => (
+                  <SelectItem key={key} value={key}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <select
-            name="industry"
-            defaultValue={currentIndustry || ""}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-            onChange={(e) => handleFilterChange("industry", e.target.value)}
-          >
-            <option value="">All Industries</option>
-            {Object.entries(INDUSTRIES).map(([key, name]) => (
-              <option key={key} value={key}>
-                {name}
-              </option>
-            ))}
-          </select>
+            <Select value={currentIndustry || "all"} onValueChange={(value) => handleFilterChange("industry", value)}>
+              <SelectTrigger className="w-[140px] sm:w-[160px] h-9">
+                <SelectValue placeholder="Industry" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Industries</SelectItem>
+                {Object.entries(INDUSTRIES).map(([key, name]) => (
+                  <SelectItem key={key} value={key}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <select
-            name="type"
-            defaultValue={currentType || ""}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-            onChange={(e) => handleFilterChange("type", e.target.value)}
-          >
-            <option value="">All Types</option>
-            {Object.entries(EMPLOYMENT_TYPES).map(([key, name]) => (
-              <option key={key} value={key}>
-                {name}
-              </option>
-            ))}
-          </select>
+            <Select value={currentType || "all"} onValueChange={(value) => handleFilterChange("type", value)}>
+              <SelectTrigger className="w-[140px] sm:w-[160px] h-9">
+                <SelectValue placeholder="Job Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {Object.entries(EMPLOYMENT_TYPES).map(([key, name]) => (
+                  <SelectItem key={key} value={key}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {(currentRegion || currentIndustry || currentType) && (
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/jobs">Clear All</Link>
-            </Button>
-          )}
-        </form>
+            {hasFilters && (
+              <Button asChild variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-foreground">
+                <Link href="/jobs" className="flex items-center gap-1">
+                  <X className="h-3.5 w-3.5" />
+                  Clear
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   )

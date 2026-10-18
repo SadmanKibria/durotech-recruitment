@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Edit, MapPin, Building2 } from "lucide-react"
 import { REGIONS, INDUSTRIES } from "@/lib/types"
 import { JobStatusToggle } from "@/components/admin/job-status-toggle"
+import { NoJobsPosted } from "@/components/empty-states"
+import { DeleteJobButton } from "@/components/admin/delete-job-button"
 
 export default async function AdminJobsPage() {
   const supabase = await createClient()
@@ -22,10 +24,10 @@ export default async function AdminJobsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Job Listings</h1>
-          <p className="text-muted-foreground">Manage your job postings</p>
+          <h1 className="text-2xl font-bold">Job Listings</h1>
+          <p className="text-muted-foreground text-sm">Manage your job postings</p>
         </div>
         <Link href="/admin/jobs/new">
           <Button>
@@ -38,17 +40,17 @@ export default async function AdminJobsPage() {
       <div className="grid gap-4">
         {jobs && jobs.length > 0 ? (
           jobs.map((job) => (
-            <Card key={job.id}>
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-lg">{job.title}</h3>
+            <Card key={job.id} className="hover:shadow-sm transition-shadow">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div className="space-y-2 flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-semibold text-lg truncate">{job.title}</h3>
                       <Badge variant={job.is_active ? "default" : "secondary"}>
                         {job.is_active ? "Active" : "Inactive"}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
                         {job.location}, {job.country}
@@ -59,35 +61,26 @@ export default async function AdminJobsPage() {
                       </span>
                       <span>{REGIONS[job.region as keyof typeof REGIONS]}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       Posted: {new Date(job.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
                     <JobStatusToggle job={job} />
                     <Link href={`/admin/jobs/${job.id}/edit`}>
                       <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
+                        <Edit className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Edit</span>
                       </Button>
                     </Link>
+                    <DeleteJobButton jobId={job.id} jobTitle={job.title} />
                   </div>
                 </div>
               </CardContent>
             </Card>
           ))
         ) : (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <p className="text-muted-foreground mb-4">No jobs posted yet</p>
-              <Link href="/admin/jobs/new">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Post Your First Job
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <NoJobsPosted />
         )}
       </div>
     </div>

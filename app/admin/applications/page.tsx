@@ -4,8 +4,9 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Mail, Phone, Download, Eye } from "lucide-react"
+import { Mail, Phone, Download, Eye, Calendar } from "lucide-react"
 import { APPLICATION_STATUSES } from "@/lib/types"
+import { NoApplications } from "@/components/empty-states"
 
 export default async function AdminApplicationsPage({
   searchParams,
@@ -33,36 +34,36 @@ export default async function AdminApplicationsPage({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "new":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-50 text-blue-700 border-blue-200"
       case "reviewed":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-amber-50 text-amber-700 border-amber-200"
       case "shortlisted":
-        return "bg-green-100 text-green-800"
+        return "bg-emerald-50 text-emerald-700 border-emerald-200"
       case "rejected":
-        return "bg-red-100 text-red-800"
+        return "bg-red-50 text-red-700 border-red-200"
       case "hired":
-        return "bg-purple-100 text-purple-800"
+        return "bg-purple-50 text-purple-700 border-purple-200"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-slate-50 text-slate-700 border-slate-200"
     }
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Applications</h1>
-        <p className="text-muted-foreground">Review and manage job applications</p>
+        <h1 className="text-2xl font-bold">Applications</h1>
+        <p className="text-muted-foreground text-sm">Review and manage job applications</p>
       </div>
 
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
         <Link href="/admin/applications">
-          <Button variant={!statusFilter ? "default" : "outline"} size="sm">
+          <Button variant={!statusFilter ? "default" : "outline"} size="sm" className="whitespace-nowrap">
             All
           </Button>
         </Link>
         {Object.entries(APPLICATION_STATUSES).map(([key, label]) => (
           <Link key={key} href={`/admin/applications?status=${key}`}>
-            <Button variant={statusFilter === key ? "default" : "outline"} size="sm">
+            <Button variant={statusFilter === key ? "default" : "outline"} size="sm" className="whitespace-nowrap">
               {label}
             </Button>
           </Link>
@@ -72,42 +73,43 @@ export default async function AdminApplicationsPage({
       <div className="grid gap-4">
         {applications && applications.length > 0 ? (
           applications.map((app) => (
-            <Card key={app.id}>
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
+            <Card key={app.id} className="hover:shadow-sm transition-shadow">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div className="space-y-2 flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-semibold text-lg">{app.name}</h3>
-                      <Badge className={getStatusColor(app.status)}>
+                      <Badge variant="outline" className={getStatusColor(app.status)}>
                         {APPLICATION_STATUSES[app.status as keyof typeof APPLICATION_STATUSES]}
                       </Badge>
                     </div>
                     <p className="text-sm font-medium text-primary">Applied for: {app.job?.title || "Unknown Job"}</p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Mail className="h-4 w-4" />
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+                      <span className="flex items-center gap-1.5 font-medium text-foreground">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
                         {app.email}
                       </span>
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1.5 text-muted-foreground">
                         <Phone className="h-4 w-4" />
                         {app.phone}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Right to work: {app.right_to_work} | Applied: {new Date(app.created_at).toLocaleDateString()}
-                    </p>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Calendar className="h-3.5 w-3.5" />
+                      Applied: {new Date(app.created_at).toLocaleDateString()}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <a href={app.resume_url} target="_blank" rel="noopener noreferrer">
+                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                    <a href={app.resume_url} target="_blank" rel="noopener noreferrer" download>
                       <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-2" />
-                        Resume
+                        <Download className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Resume</span>
                       </Button>
                     </a>
                     <Link href={`/admin/applications/${app.id}`}>
                       <Button size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View
+                        <Eye className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">View</span>
                       </Button>
                     </Link>
                   </div>
@@ -116,15 +118,7 @@ export default async function AdminApplicationsPage({
             </Card>
           ))
         ) : (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <p className="text-muted-foreground">
-                {statusFilter
-                  ? `No ${APPLICATION_STATUSES[statusFilter as keyof typeof APPLICATION_STATUSES]?.toLowerCase()} applications`
-                  : "No applications yet"}
-              </p>
-            </CardContent>
-          </Card>
+          <NoApplications filtered={!!statusFilter} />
         )}
       </div>
     </div>

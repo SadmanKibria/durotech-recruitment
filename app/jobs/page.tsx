@@ -4,11 +4,9 @@ import { Footer } from "@/components/footer"
 import { JobCard } from "@/components/job-card"
 import { createClient } from "@/lib/supabase/server"
 import type { Job } from "@/lib/types"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Briefcase } from "lucide-react"
-import Link from "next/link"
 import { JobFilters } from "@/components/job-filters"
+import { NoJobsFound, SearchNoResults } from "@/components/empty-states"
+import { JobCardGridSkeleton } from "@/components/loading-skeletons"
 
 interface JobsPageProps {
   searchParams: Promise<{
@@ -45,26 +43,24 @@ async function JobsList({ searchParams }: { searchParams: JobsPageProps["searchP
   const jobsList = (jobs || []) as Job[]
 
   if (jobsList.length === 0) {
-    return (
-      <Card className="py-12">
-        <CardContent className="text-center">
-          <Briefcase className="mx-auto h-12 w-12 text-muted" />
-          <h3 className="mt-4 text-lg font-semibold">No jobs found</h3>
-          <p className="mt-2 text-sm text-muted">Try adjusting your filters or check back later</p>
-          <Button asChild className="mt-4 bg-[#0066cc] hover:bg-[#0052a3] text-white">
-            <Link href="/jobs">Clear Filters</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    )
+    if (params.search) {
+      return <SearchNoResults query={params.search} />
+    }
+    return <NoJobsFound />
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {jobsList.map((job) => (
-        <JobCard key={job.id} job={job} />
-      ))}
-    </div>
+    <>
+      <p className="text-sm text-muted-foreground mb-6">
+        Showing {jobsList.length} {jobsList.length === 1 ? "job" : "jobs"}
+        {params.region || params.industry || params.type ? " matching your filters" : " available"}
+      </p>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {jobsList.map((job) => (
+          <JobCard key={job.id} job={job} />
+        ))}
+      </div>
+    </>
   )
 }
 
@@ -75,12 +71,12 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
     <div className="flex min-h-screen flex-col">
       <Header />
 
-      <main className="flex-1">
+      <main className="flex-1 bg-secondary/30">
         {/* Hero */}
-        <section className="bg-foreground py-12">
+        <section className="bg-slate-900 py-12 sm:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-background">Find Your Perfect Job</h1>
-            <p className="mt-2 text-muted-foreground">Browse opportunities across Europe, Middle East, and Asia</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Find Your Perfect Job</h1>
+            <p className="mt-2 text-slate-400">Browse opportunities across Europe, Middle East, and Asia</p>
           </div>
         </section>
 
@@ -88,17 +84,9 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
         <JobFilters currentRegion={params.region} currentIndustry={params.industry} currentType={params.type} />
 
         {/* Jobs List */}
-        <section className="py-12">
+        <section className="py-8 sm:py-12">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <Suspense
-              fallback={
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {[...Array(6)].map((_, i) => (
-                    <Card key={i} className="h-64 animate-pulse bg-secondary" />
-                  ))}
-                </div>
-              }
-            >
+            <Suspense fallback={<JobCardGridSkeleton count={6} />}>
               <JobsList searchParams={searchParams} />
             </Suspense>
           </div>

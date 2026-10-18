@@ -1,34 +1,123 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, Loader2, CheckCircle } from "lucide-react"
+import { Upload, Loader2, CheckCircle, FileText, X, AlertCircle } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface ApplicationFormProps {
   jobId: string
   jobTitle: string
 }
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB in bytes
+const ALLOWED_FILE_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]
+
 export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [resumeFile, setResumeFile] = useState<File | null>(null)
+
+  const validateFile = (file: File): string | null => {
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      return "Please upload a PDF or Word document (.pdf, .doc, .docx)"
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return `File size must be less than 5MB. Your file is ${(file.size / (1024 * 1024)).toFixed(1)}MB`
+    }
+    return null
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const fileError = validateFile(file)
+      if (fileError) {
+        setFieldErrors((prev) => ({ ...prev, resume: fileError }))
+        setResumeFile(null)
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ""
+        }
+      } else {
+        setFieldErrors((prev) => {
+          const { resume, ...rest } = prev
+          return rest
+        })
+        setResumeFile(file)
+      }
+    }
+  }
+
+  const removeFile = () => {
+    setResumeFile(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
+
+  const validateForm = (formData: FormData): boolean => {
+    const errors: Record<string, string> = {}
+
+    const name = formData.get("name") as string
+    const email = formData.get("email") as string
+    const phone = formData.get("phone") as string
+    const rightToWork = formData.get("rightToWork") as string
+
+    if (!name?.trim()) {
+      errors.name = "Full name is required"
+    } else if (name.trim().length < 2) {
+      errors.name = "Please enter your full name"
+    }
+
+    if (!email?.trim()) {
+      errors.email = "Email address is required"
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = "Please enter a valid email address"
+    }
+
+    if (!phone?.trim()) {
+      errors.phone = "Phone number is required"
+    } else if (phone.replace(/\D/g, "").length < 7) {
+      errors.phone = "Please enter a valid phone number"
+    }
+
+    if (!rightToWork) {
+      errors.rightToWork = "Please select your right to work status"
+    }
+
+    if (!resumeFile) {
+      errors.resume = "Please upload your resume/CV"
+    }
+
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setIsSubmitting(true)
     setError(null)
 
     const formData = new FormData(e.currentTarget)
+
+    if (!validateForm(formData)) {
+      return
+    }
+
+    setIsSubmitting(true)
     formData.append("jobId", jobId)
     formData.append("jobTitle", jobTitle)
 
@@ -50,7 +139,7 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
 
       setIsSuccess(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      setError(err instanceof Error ? err.message : "An error occurred. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -58,14 +147,16 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
 
   if (isSuccess) {
     return (
-      <div className="text-center py-8">
-        <CheckCircle className="mx-auto h-16 w-16 text-[#10b981]" />
-        <h3 className="mt-4 text-xl font-semibold text-foreground">Application Submitted!</h3>
-        <p className="mt-2 text-muted max-w-md mx-auto">
-          Thank you for applying. We have sent a confirmation email to your inbox. Our team will review your application
-          and get back to you soon.
+      <div className="text-center py-8 animate-in">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+          <CheckCircle className="h-8 w-8 text-green-600" />
+        </div>
+        <h3 className="text-xl font-semibold text-foreground">Application Submitted!</h3>
+        <p className="mt-2 text-muted-foreground max-w-md mx-auto">
+          Thank you for applying for <span className="font-medium text-foreground">{jobTitle}</span>. We've sent a
+          confirmation email to your inbox. Our team will review your application and get back to you soon.
         </p>
-        <Button onClick={() => router.push("/jobs")} className="mt-6 bg-[#0066cc] hover:bg-[#0052a3] text-white">
+        <Button onClick={() => router.push("/jobs")} className="mt-6">
           Browse More Jobs
         </Button>
       </div>
@@ -73,27 +164,62 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {error && (
+        <Alert variant="destructive" className="animate-in">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="name">Full Name *</Label>
-          <Input id="name" name="name" required placeholder="John Doe" />
+          <Label htmlFor="name">
+            Full Name <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="name"
+            name="name"
+            placeholder="John Doe"
+            className={fieldErrors.name ? "border-destructive" : ""}
+          />
+          {fieldErrors.name && <p className="text-xs text-destructive">{fieldErrors.name}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">Email Address *</Label>
-          <Input id="email" name="email" type="email" required placeholder="john@example.com" />
+          <Label htmlFor="email">
+            Email Address <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="john@example.com"
+            className={fieldErrors.email ? "border-destructive" : ""}
+          />
+          {fieldErrors.email && <p className="text-xs text-destructive">{fieldErrors.email}</p>}
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number *</Label>
-          <Input id="phone" name="phone" type="tel" required placeholder="+1 234 567 8900" />
+          <Label htmlFor="phone">
+            Phone Number <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            placeholder="+1 234 567 8900"
+            className={fieldErrors.phone ? "border-destructive" : ""}
+          />
+          {fieldErrors.phone && <p className="text-xs text-destructive">{fieldErrors.phone}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="rightToWork">Right to Work *</Label>
-          <Select name="rightToWork" required>
-            <SelectTrigger>
+          <Label htmlFor="rightToWork">
+            Right to Work <span className="text-destructive">*</span>
+          </Label>
+          <Select name="rightToWork">
+            <SelectTrigger className={fieldErrors.rightToWork ? "border-destructive" : ""}>
               <SelectValue placeholder="Select your status" />
             </SelectTrigger>
             <SelectContent>
@@ -104,67 +230,79 @@ export function ApplicationForm({ jobId, jobTitle }: ApplicationFormProps) {
               <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
+          {fieldErrors.rightToWork && <p className="text-xs text-destructive">{fieldErrors.rightToWork}</p>}
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="resume">Resume/CV (PDF) *</Label>
-        <div className="border-2 border-dashed border-input rounded-lg p-6 text-center">
+        <Label htmlFor="resume">
+          Resume/CV <span className="text-destructive">*</span>
+        </Label>
+        <div
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+            fieldErrors.resume
+              ? "border-destructive bg-destructive/5"
+              : "border-input hover:border-primary/50 hover:bg-muted/50"
+          }`}
+        >
           <input
+            ref={fileInputRef}
             id="resume"
             name="resumeInput"
             type="file"
             accept=".pdf,.doc,.docx"
-            required
             className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) {
-                setResumeFile(file)
-              }
-            }}
+            onChange={handleFileChange}
           />
-          <label htmlFor="resume" className="cursor-pointer flex flex-col items-center gap-2">
-            <Upload className="h-8 w-8 text-muted" />
-            {resumeFile ? (
-              <span className="text-sm font-medium text-foreground">{resumeFile.name}</span>
-            ) : (
-              <>
-                <span className="text-sm font-medium text-foreground">Click to upload your resume</span>
-                <span className="text-xs text-muted">PDF, DOC, or DOCX (Max 10MB)</span>
-              </>
-            )}
-          </label>
+          {resumeFile ? (
+            <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center gap-2 bg-primary/10 px-3 py-2 rounded-md">
+                <FileText className="h-5 w-5 text-primary" />
+                <span className="text-sm font-medium text-foreground">{resumeFile.name}</span>
+                <span className="text-xs text-muted-foreground">({(resumeFile.size / 1024).toFixed(0)} KB)</span>
+              </div>
+              <button type="button" onClick={removeFile} className="p-1 hover:bg-muted rounded-full transition-colors">
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
+          ) : (
+            <label htmlFor="resume" className="cursor-pointer flex flex-col items-center gap-2">
+              <Upload className="h-8 w-8 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">Click to upload your resume</span>
+              <span className="text-xs text-muted-foreground">PDF, DOC, or DOCX (Max 5MB)</span>
+            </label>
+          )}
         </div>
+        {fieldErrors.resume && <p className="text-xs text-destructive">{fieldErrors.resume}</p>}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="coverLetter">Cover Letter (Optional)</Label>
+        <Label htmlFor="coverLetter">
+          Cover Letter <span className="text-muted-foreground text-xs">(Optional)</span>
+        </Label>
         <Textarea
           id="coverLetter"
           name="coverLetter"
-          rows={5}
+          rows={4}
           placeholder="Tell us why you're interested in this position and what makes you a great fit..."
+          className="resize-none"
         />
       </div>
 
-      {error && <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg text-sm">{error}</div>}
-
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-[#0066cc] hover:bg-[#0052a3] text-white"
-        size="lg"
-      >
+      <Button type="submit" disabled={isSubmitting} className="w-full h-11" size="lg">
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Submitting...
+            Submitting Application...
           </>
         ) : (
           "Submit Application"
         )}
       </Button>
+
+      <p className="text-xs text-center text-muted-foreground">
+        By submitting this application, you agree to our privacy policy and terms of service.
+      </p>
     </form>
   )
 }
