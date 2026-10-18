@@ -1,15 +1,14 @@
-"use client"
-
 import { Suspense } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { JobCard } from "@/components/job-card"
 import { createClient } from "@/lib/supabase/server"
-import { type Job, REGIONS, INDUSTRIES, EMPLOYMENT_TYPES } from "@/lib/types"
+import type { Job } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Briefcase, Filter } from "lucide-react"
+import { Briefcase } from "lucide-react"
 import Link from "next/link"
+import { JobFilters } from "@/components/job-filters"
 
 interface JobsPageProps {
   searchParams: Promise<{
@@ -86,88 +85,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
         </section>
 
         {/* Filters */}
-        <section className="border-b border-border py-6 bg-secondary">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <form className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-muted" />
-                <span className="text-sm font-medium">Filters:</span>
-              </div>
-
-              <select
-                name="region"
-                defaultValue={params.region || ""}
-                className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                onChange={(e) => {
-                  const url = new URL(window.location.href)
-                  if (e.target.value) {
-                    url.searchParams.set("region", e.target.value)
-                  } else {
-                    url.searchParams.delete("region")
-                  }
-                  window.location.href = url.toString()
-                }}
-              >
-                <option value="">All Regions</option>
-                {Object.entries(REGIONS).map(([key, name]) => (
-                  <option key={key} value={key}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                name="industry"
-                defaultValue={params.industry || ""}
-                className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                onChange={(e) => {
-                  const url = new URL(window.location.href)
-                  if (e.target.value) {
-                    url.searchParams.set("industry", e.target.value)
-                  } else {
-                    url.searchParams.delete("industry")
-                  }
-                  window.location.href = url.toString()
-                }}
-              >
-                <option value="">All Industries</option>
-                {Object.entries(INDUSTRIES).map(([key, name]) => (
-                  <option key={key} value={key}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                name="type"
-                defaultValue={params.type || ""}
-                className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                onChange={(e) => {
-                  const url = new URL(window.location.href)
-                  if (e.target.value) {
-                    url.searchParams.set("type", e.target.value)
-                  } else {
-                    url.searchParams.delete("type")
-                  }
-                  window.location.href = url.toString()
-                }}
-              >
-                <option value="">All Types</option>
-                {Object.entries(EMPLOYMENT_TYPES).map(([key, name]) => (
-                  <option key={key} value={key}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-
-              {(params.region || params.industry || params.type) && (
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/jobs">Clear All</Link>
-                </Button>
-              )}
-            </form>
-          </div>
-        </section>
+        <JobFilters currentRegion={params.region} currentIndustry={params.industry} currentType={params.type} />
 
         {/* Jobs List */}
         <section className="py-12">
