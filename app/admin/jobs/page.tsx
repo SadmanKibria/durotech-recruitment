@@ -11,6 +11,9 @@ import { NoJobsPosted } from "@/components/empty-states"
 import { DeleteJobButton } from "@/components/admin/delete-job-button"
 import { SearchBar } from "@/components/admin/search-bar"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function AdminJobsPage({
   searchParams,
 }: {

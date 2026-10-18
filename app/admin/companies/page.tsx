@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Building2, Plus, Mail, Phone, Edit } from "lucide-react"
 import Link from "next/link"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function CompaniesPage() {
   let user = null
   try {

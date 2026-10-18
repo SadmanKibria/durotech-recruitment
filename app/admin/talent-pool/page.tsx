@@ -8,6 +8,9 @@ import Link from "next/link"
 import { type SpeculativeCV, CV_STATUSES, REGIONS, INDUSTRIES } from "@/lib/types"
 import { formatDistanceToNow } from "date-fns"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function TalentPoolPage() {
   let user = null
   try {

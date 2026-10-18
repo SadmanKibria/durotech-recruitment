@@ -9,6 +9,9 @@ import { APPLICATION_STATUSES } from "@/lib/types"
 import { NoApplications } from "@/components/empty-states"
 import { SearchBar } from "@/components/admin/search-bar"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function AdminApplicationsPage({
   searchParams,
 }: {

@@ -2,6 +2,9 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { JobForm } from "@/components/admin/job-form"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function NewJobPage() {
   const supabase = await createClient()
   const {

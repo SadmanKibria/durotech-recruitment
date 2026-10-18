@@ -8,14 +8,18 @@ import { Button } from "@/components/ui/button"
 import { APPLICATION_STATUSES } from "@/lib/types"
 import { DashboardCharts } from "@/components/admin/dashboard-charts"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function AdminDashboardPage() {
-  // In production, this would be handled by middleware
+  // This component only runs if middleware allows it through
+
+  const supabase = await createClient()
 
   let user = null
   let authError = false
 
   try {
-    const supabase = await createClient()
     const { data, error } = await supabase.auth.getUser()
 
     if (error) {
@@ -32,27 +36,6 @@ export default async function AdminDashboardPage() {
   // Only redirect if we're certain there's no user (not just a network error)
   if (!user && !authError) {
     redirect("/admin/login")
-  }
-
-  let supabase
-  try {
-    supabase = await createClient()
-  } catch (error) {
-    console.error("Failed to create Supabase client:", error)
-    // Return a minimal dashboard if Supabase is unavailable
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground text-sm">Loading dashboard data...</p>
-        </div>
-        <Card>
-          <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">Unable to connect to database. Please check your connection.</p>
-          </CardContent>
-        </Card>
-      </div>
-    )
   }
 
   // Fetch stats with error handling

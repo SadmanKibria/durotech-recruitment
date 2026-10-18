@@ -21,6 +21,9 @@ import { ApplicationNotes } from "@/components/admin/application-notes"
 import { EmailApplicantButton } from "@/components/admin/email-applicant-button"
 import { ApplicationManagementForm } from "@/components/admin/application-management-form"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function ApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
