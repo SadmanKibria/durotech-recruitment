@@ -1,463 +1,66 @@
-import type React from "react"
+import Image from "next/image"
 import Link from "next/link"
-import {
-  ArrowRight,
-  Globe,
-  Users,
-  Building2,
-  Award,
-  Briefcase,
-  ChevronRight,
-  FileText,
-  GraduationCap,
-  HardHat,
-  Stethoscope,
-  Cog,
-  Shirt,
-  Warehouse,
-  Factory,
-  TrendingUp,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { ArrowRight, BriefcaseBusiness, Check, Compass, FileText, GraduationCap, Handshake, ShieldCheck, Sparkles } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { JobCard } from "@/components/job-card"
 import { createClient } from "@/lib/supabase/server"
-import { type Job, INDUSTRIES } from "@/lib/types"
+import type { Job } from "@/lib/types"
 
-const industryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  construction: HardHat,
-  food_production: Factory,
-  health: Stethoscope,
-  engineering: Cog,
-  warehousing: Warehouse,
-  garments: Shirt,
-}
+const pathways = [
+  { icon: BriefcaseBusiness, eyebrow: "For candidates", title: "Work abroad with clarity", copy: "Explore verified vacancies and get practical support through application, documentation and mobilisation.", href: "/jobs", cta: "Explore live jobs" },
+  { icon: GraduationCap, eyebrow: "For students", title: "Make your study plan real", copy: "Navigate course selection, applications and student visa preparation with an experienced team beside you.", href: "/study-abroad", cta: "Plan your studies" },
+  { icon: Handshake, eyebrow: "For employers", title: "Build the team you need", copy: "Reach skilled international candidates and manage recruitment through one focused, accountable partner.", href: "/contact", cta: "Talk to our team" },
+]
+
+const steps = [
+  ["01", "Tell us your goal", "Apply for a role, submit your CV or speak to us about your hiring needs."],
+  ["02", "Get a clear route", "We review fit, explain the process and set out the documents and next actions."],
+  ["03", "Move forward supported", "Our team stays involved through selection, compliance and mobilisation."],
+]
 
 export default async function HomePage() {
-  const supabase = await createClient()
+  let jobs: Job[] = []
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith("https://") && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const supabase = await createClient()
+    const { data } = await supabase.from("jobs").select("*").eq("is_active", true).order("created_at", { ascending: false }).limit(6)
+    jobs = (data || []) as Job[]
+  }
 
-  const { data: featuredJobs } = await supabase
-    .from("jobs")
-    .select("*")
-    .eq("is_active", true)
-    .order("created_at", { ascending: false })
-    .limit(6)
-
-  const jobs = (featuredJobs || []) as Job[]
-
-  const stats = [
-    { icon: Users, value: "10,000+", label: "Candidates Placed" },
-    { icon: Building2, value: "500+", label: "Partner Companies" },
-    { icon: Globe, value: "30+", label: "Countries Served" },
-    { icon: Award, value: "15+", label: "Years Experience" },
-  ]
-
-  const regions = [
-    {
-      name: "Europe",
-      key: "europe",
-      countries: "Germany, Netherlands, Poland, UK, France",
-      image: "/european-city-skyline-architecture.jpg",
-      jobs: "2,500+",
-      icon: Building2,
-    },
-    {
-      name: "Middle East",
-      key: "middle_east",
-      countries: "UAE, Saudi Arabia, Qatar, Kuwait, Bahrain",
-      image: "/dubai-modern-skyline-desert.jpg",
-      jobs: "1,800+",
-      icon: Globe,
-    },
-    {
-      name: "Asia",
-      key: "asia",
-      countries: "Singapore, Philippines, Thailand, Vietnam, Malaysia",
-      image: "/singapore-modern-city-skyline.jpg",
-      jobs: "3,200+",
-      icon: TrendingUp,
-    },
-  ]
-
-  return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative bg-[#1E3A5F] py-20 md:py-28 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#F5C547]/10 via-transparent to-transparent" />
-          <div className="absolute inset-0 bg-[url('/abstract-geometric-pattern.png')] opacity-5" />
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl">
-              <Badge className="bg-[#F5C547] text-[#1E3A5F] hover:bg-[#F5C547]/90 mb-4">
-                Global Recruitment & Education Solutions
-              </Badge>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white text-balance leading-tight">
-                Your Global Career & Education
-                <span className="text-[#F5C547]"> Journey Starts Here</span>
-              </h1>
-              <p className="mt-6 text-lg text-slate-300 max-w-2xl leading-relaxed">
-                Durotech Recruitment connects talented professionals with leading employers across Europe, the Middle
-                East, and Asia. We also help students achieve their dreams of studying at world-class universities.
-              </p>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                <Button asChild size="lg" className="h-12 px-6 bg-[#F5C547] text-[#1E3A5F] hover:bg-[#F5C547]/90">
-                  <Link href="/jobs">
-                    <Briefcase className="mr-2 h-5 w-5" />
-                    Find Employment
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="h-12 px-6 border-white text-white hover:bg-white hover:text-[#1E3A5F] transition-all bg-transparent"
-                >
-                  <Link href="/study-abroad">
-                    <GraduationCap className="mr-2 h-5 w-5" />
-                    Study Abroad
-                  </Link>
-                </Button>
-              </div>
-            </div>
+  return <div className="min-h-screen bg-[#f7f8fc] text-[#111735]">
+    <Header />
+    <main>
+      <section className="relative isolate overflow-hidden bg-[#0d1974] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(255,211,90,.24),transparent_32%),linear-gradient(110deg,#0d1974_0%,#0d1974_55%,#17258d_100%)]"/>
+        <div className="absolute -right-28 -top-24 size-[420px] rounded-full border border-white/10 sm:size-[600px]"/>
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 pb-14 pt-14 sm:px-8 sm:pb-20 sm:pt-20 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:py-24">
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ffd35a]/35 bg-[#ffd35a]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[.16em] text-[#ffe48f]"><Sparkles className="size-4"/> Recruitment that moves people forward</div>
+            <h1 className="max-w-3xl text-[2.7rem] font-semibold leading-[.98] tracking-[-.045em] sm:text-6xl lg:text-7xl">Your next move should feel <span className="text-[#ffd35a]">possible.</span></h1>
+            <p className="mt-6 max-w-xl text-base leading-7 text-blue-100/85 sm:text-lg">Durotech connects people, employers and education opportunities across borders—with honest guidance and human support at every step.</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link href="/jobs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#ffd35a] px-6 font-bold text-[#0d1974] transition hover:bg-white">Find your opportunity <ArrowRight className="size-4"/></Link><Link href="/submit-cv" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/25 bg-white/5 px-6 font-semibold text-white transition hover:bg-white/12"><FileText className="size-4"/> Submit your CV</Link></div>
+            <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-100/80"><span className="flex items-center gap-2"><Check className="size-4 text-[#ffd35a]"/>Real live vacancies</span><span className="flex items-center gap-2"><Check className="size-4 text-[#ffd35a]"/>End-to-end guidance</span><span className="flex items-center gap-2"><Check className="size-4 text-[#ffd35a]"/>Mobile-friendly applications</span></div>
           </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="border-b py-12 bg-background">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-              {stats.map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                    <stat.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground">{stat.value}</p>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                </div>
-              ))}
-            </div>
+          <div className="relative mx-auto w-full max-w-[560px] lg:mx-0">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-white/15 shadow-2xl sm:aspect-[5/4] lg:aspect-[4/5]"><Image src="/professional-team-meeting-diverse-office.jpg" alt="Recruitment professionals discussing international opportunities" fill priority sizes="(max-width: 1024px) 90vw, 45vw" className="object-cover"/><div className="absolute inset-0 bg-gradient-to-t from-[#0d1974]/70 via-transparent to-transparent"/><div className="absolute inset-x-5 bottom-5 rounded-2xl border border-white/20 bg-[#0d1974]/75 p-5 backdrop-blur-xl"><p className="text-xs font-semibold uppercase tracking-[.18em] text-[#ffd35a]">One connected team</p><p className="mt-2 text-lg font-semibold">Recruitment, education and candidate support under one roof.</p></div></div>
+            <div className="absolute -bottom-5 -left-3 rounded-2xl bg-[#ffd35a] p-4 text-[#0d1974] shadow-xl sm:-left-8"><Compass className="mb-2 size-6"/><p className="text-sm font-bold">Local guidance.<br/>Global direction.</p></div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Two Services Cards */}
-        <section className="py-16 md:py-20 bg-secondary/30">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Our Services</h2>
-              <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-                We provide comprehensive recruitment and education services globally
-              </p>
-            </div>
-            <div className="grid gap-8 md:grid-cols-2">
-              {/* Employment Card */}
-              <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all group">
-                <div className="aspect-[16/9] relative bg-[#1E3A5F]">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Briefcase className="h-24 w-24 text-[#F5C547]/30" />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1E3A5F] via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <Badge className="bg-[#F5C547] text-[#1E3A5F] mb-3">Employment Services</Badge>
-                    <h3 className="text-2xl font-bold text-white">International Recruitment</h3>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <p className="text-muted-foreground mb-4">
-                    Find your dream job in Construction, Healthcare, Engineering, Garments, Food Production, and
-                    Warehousing across Europe, Middle East, and Asia.
-                  </p>
-                  <ul className="space-y-2 mb-6">
-                    <li className="flex items-center gap-2 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      Visa and work permit assistance
-                    </li>
-                    <li className="flex items-center gap-2 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      Accommodation support
-                    </li>
-                    <li className="flex items-center gap-2 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      End-to-end recruitment process
-                    </li>
-                  </ul>
-                  <div className="flex gap-3">
-                    <Button asChild className="flex-1">
-                      <Link href="/jobs">
-                        <Briefcase className="mr-2 h-4 w-4" />
-                        Browse Jobs
-                      </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="flex-1 bg-transparent">
-                      <Link href="/submit-cv">
-                        <FileText className="mr-2 h-4 w-4" />
-                        Submit CV
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
+        <div className="max-w-2xl"><p className="text-sm font-bold uppercase tracking-[.18em] text-[#0d1974]">Choose your path</p><h2 className="mt-3 text-3xl font-semibold tracking-[-.035em] sm:text-5xl">Different ambitions. One team to help you move.</h2></div>
+        <div className="mt-10 grid gap-4 lg:grid-cols-3">{pathways.map((item,index)=><Link key={item.title} href={item.href} className={`group rounded-[1.75rem] p-6 transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-8 ${index===1?"bg-[#ffd35a] text-[#0d1974]":"border border-[#dfe3f0] bg-white"}`}><span className={`grid size-12 place-items-center rounded-2xl ${index===1?"bg-[#0d1974] text-white":"bg-[#eef0ff] text-[#0d1974]"}`}><item.icon className="size-5"/></span><p className="mt-8 text-xs font-bold uppercase tracking-[.17em] opacity-60">{item.eyebrow}</p><h3 className="mt-2 text-2xl font-semibold tracking-tight">{item.title}</h3><p className="mt-3 leading-7 opacity-75">{item.copy}</p><span className="mt-7 flex items-center gap-2 font-bold">{item.cta}<ArrowRight className="size-4 transition group-hover:translate-x-1"/></span></Link>)}</div>
+      </section>
 
-              {/* Study Abroad Card */}
-              <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all group">
-                <div className="aspect-[16/9] relative bg-[#1E3A5F]">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <GraduationCap className="h-24 w-24 text-[#F5C547]/30" />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1E3A5F] via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <Badge className="bg-[#F5C547] text-[#1E3A5F] mb-3">Education Services</Badge>
-                    <h3 className="text-2xl font-bold text-white">Study Abroad Programs</h3>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <p className="text-muted-foreground mb-4">
-                    Achieve your academic dreams at world-class universities in UK, Germany, Canada, Australia, USA, and
-                    more with our expert guidance.
-                  </p>
-                  <ul className="space-y-2 mb-6">
-                    <li className="flex items-center gap-2 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      University selection & application
-                    </li>
-                    <li className="flex items-center gap-2 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      Student visa assistance
-                    </li>
-                    <li className="flex items-center gap-2 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      Scholarship guidance
-                    </li>
-                  </ul>
-                  <Button asChild className="w-full">
-                    <Link href="/study-abroad">
-                      <GraduationCap className="mr-2 h-4 w-4" />
-                      Explore Programs
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+      {jobs.length>0&&<section className="bg-white py-16 sm:py-24"><div className="mx-auto max-w-7xl px-5 sm:px-8"><div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="text-sm font-bold uppercase tracking-[.18em] text-[#0d1974]">Open now</p><h2 className="mt-3 text-3xl font-semibold tracking-[-.035em] sm:text-5xl">Your next opportunity</h2><p className="mt-3 text-slate-600">Current roles published by the Durotech recruitment team.</p></div><Link href="/jobs" className="flex items-center gap-2 font-bold text-[#0d1974]">View all jobs <ArrowRight className="size-4"/></Link></div><div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{jobs.map(job=><JobCard key={job.id} job={job}/>)}</div></div></section>}
 
-        {/* Featured Jobs Section */}
-        <section className="py-16 md:py-20 bg-background">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Featured Opportunities</h2>
-                <p className="mt-2 text-muted-foreground">Explore our latest job openings across the globe</p>
-              </div>
-              <Button asChild variant="outline" className="hidden sm:flex bg-transparent">
-                <Link href="/jobs">
-                  View All Jobs
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
+      <section className="relative overflow-hidden bg-[#ffd35a] py-16 sm:py-24"><div className="absolute right-0 top-0 size-72 translate-x-1/3 -translate-y-1/3 rounded-full border-[50px] border-[#0d1974]/8"/><div className="relative mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[.85fr_1.15fr] lg:items-start"><div><p className="text-sm font-bold uppercase tracking-[.18em] text-[#0d1974]">A clearer process</p><h2 className="mt-3 text-3xl font-semibold tracking-[-.035em] text-[#0d1974] sm:text-5xl">Know what happens next.</h2><p className="mt-5 max-w-md leading-7 text-[#0d1974]/70">International recruitment can feel complicated. We make each stage visible, practical and easier to navigate.</p></div><div className="grid gap-3">{steps.map(([number,title,copy])=><div key={number} className="grid grid-cols-[54px_1fr] gap-4 rounded-2xl bg-white/85 p-5 shadow-sm backdrop-blur sm:p-6"><span className="text-2xl font-bold text-[#0d1974]/30">{number}</span><div><h3 className="text-lg font-bold text-[#0d1974]">{title}</h3><p className="mt-1 leading-6 text-slate-600">{copy}</p></div></div>)}</div></div></section>
 
-            {jobs.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {jobs.map((job) => (
-                  <JobCard key={job.id} job={job} />
-                ))}
-              </div>
-            ) : (
-              <Card className="py-16 border-dashed">
-                <CardContent className="text-center">
-                  <Briefcase className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                  <h3 className="mt-4 text-lg font-semibold">No jobs available</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">Check back soon for new opportunities</p>
-                </CardContent>
-              </Card>
-            )}
+      <section className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-2 lg:items-center"><div className="relative aspect-square overflow-hidden rounded-[2rem] sm:aspect-[4/3]"><Image src="/global-business-handshake-partnership.jpg" alt="An international recruitment partnership" fill sizes="(max-width: 1024px) 90vw, 50vw" className="object-cover"/></div><div className="lg:pl-10"><span className="grid size-12 place-items-center rounded-2xl bg-[#eef0ff] text-[#0d1974]"><ShieldCheck className="size-6"/></span><p className="mt-7 text-sm font-bold uppercase tracking-[.18em] text-[#0d1974]">Built around trust</p><h2 className="mt-3 text-3xl font-semibold tracking-[-.035em] sm:text-5xl">Straight answers. Real support.</h2><p className="mt-5 leading-7 text-slate-600">We focus on clear communication, responsible recruitment and opportunities that candidates can understand before they commit.</p><ul className="mt-7 space-y-4">{["Vacancy details presented clearly","Support for applications and documentation","A real team available when questions come up"].map(item=><li key={item} className="flex gap-3 font-medium"><span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-[#ffd35a] text-[#0d1974]"><Check className="size-4"/></span>{item}</li>)}</ul><Link href="/about" className="mt-8 inline-flex items-center gap-2 font-bold text-[#0d1974]">Meet Durotech <ArrowRight className="size-4"/></Link></div></section>
 
-            <div className="mt-8 text-center sm:hidden">
-              <Button asChild>
-                <Link href="/jobs">
-                  View All Jobs
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Regions Section */}
-        <section className="relative py-20 md:py-28 bg-gradient-to-b from-slate-50 to-white overflow-hidden">
-          {/* Subtle background pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(30,58,95,0.05)_0%,transparent_50%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(245,197,71,0.05)_0%,transparent_50%)]" />
-
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {/* Header */}
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1E3A5F]/5 mb-4">
-                <Globe className="h-4 w-4 text-[#1E3A5F]" />
-                <span className="text-sm font-medium text-[#1E3A5F]">Global Opportunities</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#1E3A5F] mb-4">We Operate Globally</h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Find opportunities in your preferred region across three continents
-              </p>
-            </div>
-
-            {/* Regions Grid */}
-            <div className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto">
-              {regions.map((region, index) => (
-                <Link
-                  key={region.key}
-                  href={`/jobs?region=${region.key}`}
-                  className="group relative"
-                  style={{
-                    animation: "fadeInUp 0.6s ease-out forwards",
-                    animationDelay: `${index * 100}ms`,
-                    opacity: 0,
-                  }}
-                >
-                  <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
-                    {/* Top colored bar */}
-                    <div className="h-2 w-full bg-gradient-to-r from-[#1E3A5F] to-[#F5C547]" />
-
-                    {/* Content */}
-                    <div className="p-8">
-                      {/* Icon */}
-                      <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[#1E3A5F] to-[#2A4A6F] mb-4 group-hover:scale-110 transition-transform duration-300">
-                        <region.icon className="h-7 w-7 text-white" />
-                      </div>
-
-                      {/* Region name */}
-                      <h3 className="text-2xl font-bold text-[#1E3A5F] mb-2 flex items-center gap-2">
-                        {region.name}
-                        <ChevronRight className="h-5 w-5 text-[#F5C547] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-                      </h3>
-
-                      {/* Countries */}
-                      <p className="text-sm text-slate-600 mb-4 leading-relaxed">{region.countries}</p>
-
-                      {/* Job count badge */}
-                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5C547]/10 border border-[#F5C547]/20">
-                        <Briefcase className="h-3.5 w-3.5 text-[#1E3A5F]" />
-                        <span className="text-sm font-semibold text-[#1E3A5F]">{region.jobs} Jobs</span>
-                      </div>
-                    </div>
-
-                    {/* Hover indicator */}
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A5F] to-[#F5C547] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Bottom CTA */}
-            <div className="mt-16 text-center">
-              <p className="text-slate-600 mb-4">Looking for something else?</p>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="border-[#1E3A5F] text-[#1E3A5F] hover:bg-[#1E3A5F] hover:text-white transition-all bg-transparent"
-              >
-                <Link href="/jobs">
-                  <Globe className="mr-2 h-5 w-5" />
-                  View All Jobs Worldwide
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Industries Section */}
-        <section className="py-16 md:py-20 bg-background">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Industries We Serve</h2>
-              <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-                Specialized recruitment across diverse sectors
-              </p>
-            </div>
-
-            <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-6">
-              {Object.entries(INDUSTRIES).map(([key, name]) => {
-                const IconComponent = industryIcons[key] || Building2
-                return (
-                  <Link key={key} href={`/jobs?industry=${key}`}>
-                    <Card className="p-5 text-center hover:border-primary hover:shadow-md transition-all cursor-pointer h-full group">
-                      <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
-                        <IconComponent className="h-6 w-6 text-primary" />
-                      </div>
-                      <p className="font-medium text-foreground text-sm">{name}</p>
-                    </Card>
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* Submit CV CTA Section */}
-        <section className="py-16 md:py-20 bg-secondary/30">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <Card className="bg-gradient-to-br from-[#1E3A5F] to-[#2A4A6F] border-0 overflow-hidden">
-              <CardContent className="p-8 md:p-12">
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  <div className="flex-1 text-center md:text-left">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-white">Don't See the Right Role?</h2>
-                    <p className="mt-4 text-slate-300 max-w-xl">
-                      Submit your CV to our talent pool and we'll match you with suitable positions as they become
-                      available. Be the first to know about new opportunities.
-                    </p>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <Button asChild size="lg" className="h-12 px-8 bg-[#F5C547] text-[#1E3A5F] hover:bg-[#F5C547]/90">
-                      <Link href="/submit-cv">
-                        <FileText className="mr-2 h-5 w-5" />
-                        Submit Your CV
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="bg-[#F5C547] py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#1E3A5F]">Ready to Take the Next Step?</h2>
-            <p className="mt-4 text-lg text-[#1E3A5F]/80 max-w-2xl mx-auto">
-              Whether you're seeking employment or education opportunities abroad, we're here to help you succeed.
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="h-12 px-8 bg-[#1E3A5F] text-white hover:bg-[#1E3A5F]/90">
-                <Link href="/jobs">
-                  <Briefcase className="mr-2 h-5 w-5" />
-                  Find Jobs
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="h-12 px-8 border-[#1E3A5F] text-[#1E3A5F] hover:bg-[#1E3A5F]/10 bg-transparent"
-              >
-                <Link href="/study-abroad">
-                  <GraduationCap className="mr-2 h-5 w-5" />
-                  Study Abroad
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <Footer />
-    </div>
-  )
+      <section className="px-5 pb-16 sm:px-8 sm:pb-24"><div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-[#0d1974] px-6 py-12 text-center text-white sm:px-12 sm:py-16"><p className="text-sm font-bold uppercase tracking-[.18em] text-[#ffd35a]">Ready when you are</p><h2 className="mx-auto mt-3 max-w-2xl text-3xl font-semibold tracking-[-.035em] sm:text-5xl">Take the next step with a team behind you.</h2><div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/jobs" className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#ffd35a] px-7 font-bold text-[#0d1974]">Browse live jobs</Link><Link href="/contact" className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/25 px-7 font-bold text-white">Speak to Durotech</Link></div></div></section>
+    </main>
+    <Footer />
+  </div>
 }

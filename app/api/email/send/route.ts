@@ -14,18 +14,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { to, subject, message } = await request.json()
+    const { to, subject, message } = await request.json() as { to?: string; subject?: string; message?: string }
 
-    if (!to || !subject || !message) {
+    if (!to?.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) || !subject?.trim() || !message?.trim()) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    const success = await sendCustomEmail(to, subject, message)
+    if (subject.length > 160 || message.length > 10000) {
+      return NextResponse.json({ error: "Email content is too long" }, { status: 400 })
+    }
 
-    if (success) {
+    const result = await sendCustomEmail(to, subject.trim(), message.trim())
+
+    if (result.success) {
       return NextResponse.json({ success: true })
     } else {
-      return NextResponse.json({ error: "Failed to send email" }, { status: 500 })
+      return NextResponse.json({ error: result.error || "Failed to send email" }, { status: 502 })
     }
   } catch (error) {
     console.error("Email API error:", error)

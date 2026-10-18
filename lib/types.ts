@@ -31,10 +31,12 @@ export interface Application {
   accommodation_required: string
   food_required: string
   reference_agent: string | null
+  agent_id: string | null
   total_agreed_amount: number | null
   arrival_date: string | null
   assigned_company: string | null
   status_changed_at: string | null
+  status_change_date: string | null
   is_duplicate: boolean
   duplicate_application_ids: string[] | null
   resume_url: string

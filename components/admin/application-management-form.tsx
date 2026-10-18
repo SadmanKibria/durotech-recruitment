@@ -13,7 +13,6 @@ import { Loader2, Plus, Save, DollarSign, FileText, Upload, Check, AlertCircle }
 import { APPLICATION_STATUSES } from "@/lib/types"
 import type { Application } from "@/lib/types"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { sendStatusUpdateEmail } from "@/lib/maileroo"
 
 interface Agent {
   id: string
@@ -90,12 +89,11 @@ export function ApplicationManagementForm({ application }: { application: Applic
 
       // Send email notification if status changed
       if (statusChanged) {
-        await sendStatusUpdateEmail(
-          application.email,
-          application.name,
-          application.job?.title || "Position",
-          status
-        ).catch((err) => {
+        await fetch("/api/email/send", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({
+          to: application.email,
+          subject: `Application update — ${application.job?.title || "Position"}`,
+          message: `Hello ${application.name},\n\nYour application status has been updated to: ${APPLICATION_STATUSES[status]}.\n\nIf you have any questions, please reply to this email.\n\nDurotech Recruitment`,
+        }) }).catch((err) => {
           console.error("Failed to send status update email:", err)
           // Don't fail the status update if email fails
         })
@@ -244,7 +242,7 @@ export function ApplicationManagementForm({ application }: { application: Applic
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="status">Application Status</Label>
-          <Select value={status} onValueChange={setStatus}>
+          <Select value={status} onValueChange={value => setStatus(value as Application["status"])}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>

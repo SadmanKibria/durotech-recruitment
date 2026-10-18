@@ -1,4 +1,3 @@
-import { Suspense } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { JobCard } from "@/components/job-card"
@@ -6,7 +5,6 @@ import { createClient } from "@/lib/supabase/server"
 import type { Job } from "@/lib/types"
 import { JobFilters } from "@/components/job-filters"
 import { NoJobsFound, SearchNoResults } from "@/components/empty-states"
-import { JobCardGridSkeleton } from "@/components/loading-skeletons"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -117,9 +115,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
         {/* Jobs List */}
         <section className="py-8 sm:py-12">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <Suspense fallback={<JobCardGridSkeleton count={6} />}>
-              <JobsList searchParams={searchParams} />
-            </Suspense>
+            {await JobsList({ searchParams })}
           </div>
         </section>
       </main>
