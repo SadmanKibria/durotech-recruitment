@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Building2, Plus, Mail, Phone } from "lucide-react"
+import { Building2, Plus, Mail, Phone, Edit } from "lucide-react"
 import Link from "next/link"
 
 export default async function CompaniesPage() {
@@ -39,13 +39,20 @@ export default async function CompaniesPage() {
         {companies?.map((company) => (
           <Card key={company.id} className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Building2 className="h-5 w-5 text-primary" />
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
+                    <Building2 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base line-clamp-1">{company.name}</CardTitle>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <CardTitle className="text-base line-clamp-1">{company.name}</CardTitle>
-                </div>
+                <Link href={`/admin/companies/${company.id}/edit`}>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
@@ -56,7 +63,7 @@ export default async function CompaniesPage() {
                   className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <Mail className="h-3 w-3" />
-                  {company.contact_email}
+                  <span className="truncate">{company.contact_email}</span>
                 </a>
               )}
               {company.contact_phone && (
@@ -70,15 +77,20 @@ export default async function CompaniesPage() {
         ))}
       </div>
 
-      {!companies ||
-        (companies.length === 0 && (
-          <Card className="border-dashed">
-            <CardContent className="py-12 text-center">
-              <Building2 className="mx-auto h-12 w-12 text-muted-foreground/50" />
-              <p className="mt-4 text-muted-foreground">No companies added yet</p>
-            </CardContent>
-          </Card>
-        ))}
+      {!companies || companies.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="py-12 text-center">
+            <Building2 className="mx-auto h-12 w-12 text-muted-foreground/50" />
+            <p className="mt-4 text-muted-foreground">No companies added yet</p>
+            <Link href="/admin/companies/new">
+              <Button className="mt-4 bg-transparent" variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Your First Company
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   )
 }
