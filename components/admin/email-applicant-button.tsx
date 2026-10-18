@@ -46,12 +46,7 @@ export function EmailApplicantButton({ applicantEmail, applicantName, jobTitle }
         body: JSON.stringify({
           to: applicantEmail,
           subject,
-          html: `
-            <p>Dear ${applicantName},</p>
-            <div style="white-space: pre-wrap;">${message}</div>
-            <br/>
-            <p>Best regards,<br/>Durotech Recruitment Team</p>
-          `,
+          message: `Hello ${applicantName},\n\n${message}\n\nBest regards,\nDurotech Recruitment Team`,
         }),
       })
 

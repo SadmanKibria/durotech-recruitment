@@ -27,6 +27,7 @@ export default async function AdminJobsPage({
 
   if (!user) redirect("/admin/login")
 
+  const { count: jobCount } = await supabase.from("jobs").select("id", { count: "exact", head: true })
   let query = supabase.from("jobs").select("*").order("created_at", { ascending: false })
   if (search) {
     query = query.or(
@@ -41,10 +42,10 @@ export default async function AdminJobsPage({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Job Listings</h1>
-          <p className="text-muted-foreground text-sm">Manage your job postings</p>
+          <p className="text-muted-foreground text-sm">Manage your job postings · {jobCount ?? 0} of 50 used</p>
         </div>
-        <Link href="/admin/jobs/new">
-          <Button>
+        <Link href={jobCount && jobCount >= 50 ? "#" : "/admin/jobs/new"} aria-disabled={Boolean(jobCount && jobCount >= 50)}>
+          <Button disabled={Boolean(jobCount && jobCount >= 50)}>
             <Plus className="h-4 w-4 mr-2" />
             Post New Job
           </Button>
