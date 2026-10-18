@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Textarea } from "@/components/ui/textarea"
@@ -14,6 +14,12 @@ import { APPLICATION_STATUSES } from "@/lib/types"
 import type { Application } from "@/lib/types"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { sendStatusUpdateEmail } from "@/lib/maileroo"
+
+interface Agent {
+  id: string
+  name: string
+  email: string
+}
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
@@ -32,6 +38,17 @@ export function ApplicationManagementForm({ application }: { application: Applic
   const [totalAgreedAmount, setTotalAgreedAmount] = useState(application.total_agreed_amount?.toString() || "")
   const [arrivalDate, setArrivalDate] = useState(application.arrival_date || "")
   const [assignedCompany, setAssignedCompany] = useState(application.assigned_company || "")
+  const [agentId, setAgentId] = useState(application.agent_id || "")
+  const [agents, setAgents] = useState<Agent[]>([])
+
+  // Load agents on mount
+  useEffect(() => {
+    const loadAgents = async () => {
+      const { data } = await supabase.from("agents").select("id, name, email").order("name")
+      if (data) setAgents(data)
+    }
+    loadAgents()
+  }, [])
 
   // Payment form
   const [paymentType, setPaymentType] = useState("incoming")
@@ -53,7 +70,7 @@ export function ApplicationManagementForm({ application }: { application: Applic
     try {
       // Check if status changed
       const statusChanged = status !== application.status
-
+      
       const { error: updateError } = await supabase
         .from("applications")
         .update({
@@ -63,6 +80,8 @@ export function ApplicationManagementForm({ application }: { application: Applic
           total_agreed_amount: totalAgreedAmount ? Number.parseFloat(totalAgreedAmount) : null,
           arrival_date: arrivalDate || null,
           assigned_company: assignedCompany || null,
+          agent_id: agentId || null,
+          status_change_date: statusChanged ? new Date().toISOString() : application.status_change_date,
           updated_at: new Date().toISOString(),
         })
         .eq("id", application.id)
@@ -292,6 +311,22 @@ export function ApplicationManagementForm({ application }: { application: Applic
             onChange={(e) => setTotalAgreedAmount(e.target.value)}
             placeholder="0.00"
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="agentId">Assigned Agent</Label>
+          <Select value={agentId} onValueChange={setAgentId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select an agent" />
+            </SelectTrigger>
+            <SelectContent>
+              {agents.map((agent) => (
+                <SelectItem key={agent.id} value={agent.id}>
+                  {agent.name} ({agent.email})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

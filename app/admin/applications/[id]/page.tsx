@@ -15,6 +15,9 @@ import {
   Utensils,
   AlertTriangle,
   DollarSign,
+  Building2,
+  Plane,
+  Users,
 } from "lucide-react"
 import { APPLICATION_STATUSES, INDUSTRIES, REGIONS } from "@/lib/types"
 import { ApplicationNotes } from "@/components/admin/application-notes"
@@ -38,7 +41,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
 
   if (!user) redirect("/admin/login")
 
-  const { data: application } = await supabase.from("applications").select("*, job:jobs(*)").eq("id", id).single()
+  const { data: application } = await supabase.from("applications").select("*, job:jobs(*), agent:agents(*)").eq("id", id).single()
 
   if (!application) notFound()
 
@@ -120,6 +123,33 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
                 <p className="font-medium">{application.citizenship_country || "Not specified"}</p>
               </div>
             </div>
+            {application.assigned_company && (
+              <div className="flex items-center gap-3">
+                <Building2 className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Assigned Company</p>
+                  <p className="font-medium">{application.assigned_company}</p>
+                </div>
+              </div>
+            )}
+            {application.arrival_date && (
+              <div className="flex items-center gap-3">
+                <Plane className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Arrival Date</p>
+                  <p className="font-medium">{new Date(application.arrival_date).toLocaleDateString()}</p>
+                </div>
+              </div>
+            )}
+            {application.agent && (
+              <div className="flex items-center gap-3">
+                <Users className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Assigned Agent</p>
+                  <p className="font-medium">{application.agent.name}</p>
+                </div>
+              </div>
+            )}
             {application.total_agreed_amount && (
               <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
                 <DollarSign className="h-5 w-5 text-primary" />
