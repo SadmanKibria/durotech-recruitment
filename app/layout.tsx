@@ -8,38 +8,42 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
   title: {
-    default: "Durotech Recruitment | International Staffing Solutions",
+    default: "Durotech Recruitment | International Staffing & Study Abroad Solutions by Sadman Kibria",
     template: "%s | Durotech Recruitment",
   },
   description:
-    "Leading international recruitment agency connecting talented professionals with top employers across Europe, Middle East, and Asia. Specialising in construction, healthcare, engineering, food production, and warehousing. Founded by Sadman Kibria.",
+    "Leading international recruitment agency founded by Sadman Kibria, connecting talented professionals with top employers across Europe, Middle East, and Asia. Specialising in construction, healthcare, engineering, food production, warehousing, and study abroad programs. 15+ years of expertise with 5000+ successful placements.",
   keywords: [
-    "recruitment agency",
-    "international jobs",
-    "staffing solutions",
-    "construction jobs",
-    "healthcare recruitment",
-    "engineering jobs",
-    "warehousing jobs",
-    "food production jobs",
-    "garment industry jobs",
-    "Europe jobs",
-    "Middle East jobs",
-    "Asia jobs",
-    "UK recruitment",
-    "Dubai jobs",
-    "Singapore jobs",
-    "visa sponsorship jobs",
-    "Durotech",
     "Sadman Kibria",
-    "London recruitment agency",
-    "international recruitment",
+    "Durotech Recruitment",
+    "international recruitment agency",
     "overseas jobs",
     "work abroad",
+    "visa sponsorship jobs",
+    "construction jobs Europe",
+    "healthcare jobs UK",
+    "engineering jobs Middle East",
+    "warehouse jobs",
+    "food production jobs",
+    "garment industry jobs",
+    "study abroad",
+    "UK universities",
+    "European universities",
+    "student visa assistance",
+    "London recruitment agency",
+    "international staffing solutions",
+    "employment agency",
+    "job placement services",
+    "Dubai jobs",
+    "Singapore jobs",
+    "Germany jobs",
+    "Canada study visa",
+    "Australia education",
+    "global recruitment",
   ],
-  authors: [{ name: "Sadman Kibria" }, { name: "Durotech Recruitment" }],
+  authors: [{ name: "Sadman Kibria", url: "https://durotech.co.uk" }, { name: "Durotech Recruitment" }],
   creator: "Sadman Kibria",
-  publisher: "Durotech Recruitment",
+  publisher: "Durotech Recruitment Ltd",
   metadataBase: new URL("https://durotech.co.uk"),
   robots: {
     index: true,
@@ -57,32 +61,32 @@ export const metadata: Metadata = {
     locale: "en_GB",
     url: "https://durotech.co.uk",
     siteName: "Durotech Recruitment",
-    title: "Durotech Recruitment | International Staffing Solutions",
+    title: "Durotech Recruitment | International Staffing & Study Abroad Solutions",
     description:
-      "Leading international recruitment agency founded by Sadman Kibria. Connecting talented professionals with top employers across Europe, Middle East, and Asia.",
+      "Leading international recruitment agency founded by Sadman Kibria. 15+ years connecting talented professionals with top employers and students with world-class universities across Europe, Middle East, and Asia.",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Durotech Recruitment - International Staffing Solutions",
+        alt: "Durotech Recruitment - International Staffing Solutions by Sadman Kibria",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Durotech Recruitment | International Staffing Solutions",
+    title: "Durotech Recruitment | International Jobs & Study Abroad",
     description:
-      "Leading international recruitment agency connecting talented professionals with top employers across Europe, Middle East, and Asia.",
+      "Founded by Sadman Kibria. Connecting professionals with global employers and students with world-class universities. 15+ years of excellence.",
     images: ["/og-image.jpg"],
     creator: "@durotechrecruitment",
   },
   alternates: {
     canonical: "https://durotech.co.uk",
   },
-  category: "Recruitment",
+  category: "Recruitment & Education Services",
   verification: {
-    google: "google-site-verification-code",
+    google: "your-google-verification-code",
   },
     generator: 'v0.app'
 }
@@ -113,13 +117,15 @@ export default function RootLayout({
               "@type": "EmploymentAgency",
               name: "Durotech Recruitment",
               alternateName: "Durotech",
+              legalName: "Durotech Recruitment Ltd",
               founder: {
                 "@type": "Person",
                 name: "Sadman Kibria",
                 jobTitle: "Founder & Director",
+                sameAs: ["https://www.linkedin.com/in/sadman-kibria", "https://durotech.co.uk"],
               },
               description:
-                "International recruitment agency specialising in construction, healthcare, engineering, food production, warehousing, and garment sectors across Europe, Middle East, and Asia.",
+                "International recruitment and education consultancy specialising in construction, healthcare, engineering, food production, warehousing, garment sectors, and study abroad programs across Europe, Middle East, and Asia.",
               url: "https://durotech.co.uk",
               logo: "https://durotech.co.uk/durotech-logo.png",
               image: "https://durotech.co.uk/og-image.jpg",
@@ -142,13 +148,18 @@ export default function RootLayout({
                 telephone: "+44-20-1234-5678",
                 contactType: "customer service",
                 email: "info@durotech.co.uk",
-                availableLanguage: ["English"],
-                areaServed: ["GB", "AE", "SA", "SG", "BD", "DE", "PL"],
+                availableLanguage: ["English", "Arabic", "Bengali", "Polish", "Romanian"],
+                areaServed: ["GB", "AE", "SA", "SG", "BD", "DE", "PL", "RO", "PK", "IN"],
               },
               areaServed: [
-                { "@type": "Continent", name: "Europe" },
-                { "@type": "Place", name: "Middle East" },
-                { "@type": "Continent", name: "Asia" },
+                { "@type": "Country", name: "United Kingdom" },
+                { "@type": "Country", name: "United Arab Emirates" },
+                { "@type": "Country", name: "Germany" },
+                { "@type": "Country", name: "Poland" },
+                { "@type": "Country", name: "Saudi Arabia" },
+                { "@type": "Country", name: "Singapore" },
+                { "@type": "Country", name: "Canada" },
+                { "@type": "Country", name: "Australia" },
               ],
               serviceType: [
                 "International Recruitment",
@@ -157,6 +168,8 @@ export default function RootLayout({
                 "Contract Staffing",
                 "Visa Sponsorship",
                 "Study Abroad Consulting",
+                "University Application Support",
+                "Student Visa Assistance",
               ],
               knowsAbout: [
                 "Construction Recruitment",
@@ -165,6 +178,8 @@ export default function RootLayout({
                 "Warehousing Employment",
                 "Food Production Staffing",
                 "Garment Industry Recruitment",
+                "International Education",
+                "Study Abroad Programs",
               ],
               slogan: "Connecting Talent With Opportunity Worldwide",
               foundingDate: "2009",
@@ -172,11 +187,28 @@ export default function RootLayout({
                 "@type": "AggregateRating",
                 ratingValue: "4.8",
                 reviewCount: "500",
+                bestRating: "5",
+                worstRating: "1",
               },
+              priceRange: "$$",
+              paymentAccepted: "Cash, Credit Card, Bank Transfer",
+              openingHoursSpecification: [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                  opens: "09:00",
+                  closes: "18:00",
+                },
+              ],
             }),
           }}
         />
         <link rel="canonical" href="https://durotech.co.uk" />
+        <meta name="author" content="Sadman Kibria" />
+        <meta name="geo.region" content="GB-LND" />
+        <meta name="geo.placename" content="London" />
+        <meta name="geo.position" content="51.5074;-0.1278" />
+        <meta name="ICBM" content="51.5074, -0.1278" />
       </head>
       <body className={`${inter.className} antialiased`}>
         {children}

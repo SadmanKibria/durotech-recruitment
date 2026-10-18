@@ -5,12 +5,27 @@ import { SubmitCVForm } from "@/components/submit-cv-form"
 import { FileText, CheckCircle, Globe, Briefcase } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Submit Your CV | Durotech Recruitment",
+  title: "Submit Your CV - Join Our Talent Pool",
   description:
-    "Submit your CV for future job opportunities across Europe, Middle East, and Asia. Join our talent pool today.",
+    "Submit your CV to Durotech Recruitment's talent pool and get matched with international job opportunities in construction, healthcare, engineering, warehousing, and food production. Visa sponsorship available.",
+  keywords: [
+    "submit CV",
+    "upload resume",
+    "talent pool",
+    "international job opportunities",
+    "recruitment database",
+    "CV submission",
+    "career opportunities",
+    "job matching",
+    "overseas employment",
+  ],
   openGraph: {
-    title: "Submit Your CV | Durotech Recruitment",
-    description: "Submit your CV for future job opportunities across Europe, Middle East, and Asia.",
+    title: "Submit Your CV - Join Our International Talent Pool",
+    description: "Upload your CV and get matched with job opportunities across Europe, Middle East, and Asia.",
+    url: "https://durotech.co.uk/submit-cv",
+  },
+  alternates: {
+    canonical: "https://durotech.co.uk/submit-cv",
   },
 }
 
